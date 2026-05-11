@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Distributore – Gestione Carburanti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --bg2: #181818;
+    --bg3: #222;
+    --border: #2e2e2e;
+    --border2: #3a3a3a;
+    --text: #e8e8e8;
+    --muted: #888;
+    --accent-diesel: #e8a020;
+    --accent-verde: #3db87a;
+    --accent-danger: #e05252;
+    --accent-info: #4a9ede;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+    --radius: 6px;
+    --radius-lg: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; min-height: 100vh; }
+
+  /* NAV */
+  nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 1.5rem; display: flex; align-items: center; gap: 0; position: sticky; top: 0; z-index: 100; }
+  .nav-brand { font-family: var(--font-mono); font-size: 13px; color: var(--accent-diesel); padding: 1rem 1.5rem 1rem 0; border-right: 1px solid var(--border); margin-right: 1rem; letter-spacing: 0.05em; white-space: nowrap; }
+  .nav-tabs { display: flex; gap: 0; }
+  .nav-tab { padding: 1rem 1.2rem; cursor: pointer; color: var(--muted); font-size: 13px; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+  .nav-tab:hover { color: var(--text); }
+  .nav-tab.active { color: var(--text); border-bottom-color: var(--accent-diesel); }
+  .nav-spacer { flex: 1; }
+  .nav-date { font-family: var(--font-mono); font-size: 11px; color: var(--muted); padding: 0 0 0 1rem; }
+
+  /* LAYOUT */
+  .page { display: none; padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .card-title { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+
+  /* GRID */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  @media (max-width: 700px) { .grid-3, .grid-4 { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
+
+  /* CISTERNA CARD */
+  .cisterna-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; position: relative; overflow: hidden; }
+  .cisterna-card.diesel { border-top: 3px solid var(--accent-diesel); }
+  .cisterna-card.verde { border-top: 3px solid var(--accent-verde); }
+  .cisterna-card.alert { border-color: var(--accent-danger) !important; }
+  .cisterna-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  .cisterna-name { font-size: 16px; font-weight: 500; margin-bottom: 1rem; }
+  .cisterna-litri { font-family: var(--font-mono); font-size: 32px; font-weight: 600; line-height: 1; }
+  .cisterna-litri.diesel { color: var(--accent-diesel); }
+  .cisterna-litri.verde { color: var(--accent-verde); }
+  .cisterna-litri.alert { color: var(--accent-danger); }
+  .cisterna-unit { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .cisterna-cm { font-family: var(--font-mono); font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .cisterna-bar-wrap { margin-top: 1rem; background: var(--bg3); border-radius: 3px; height: 6px; overflow: hidden; }
+  .cisterna-bar { height: 100%; border-radius: 3px; transition: width 0.4s; }
+  .cisterna-bar.diesel { background: var(--accent-diesel); }
+  .cisterna-bar.verde { background: var(--accent-verde); }
+  .cisterna-bar.alert { background: var(--accent-danger); }
+  .cisterna-footer { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
+  .badge-alert { position: absolute; top: 12px; right: 12px; background: var(--accent-danger); color: #fff; font-size: 10px; font-family: var(--font-mono); padding: 2px 8px; border-radius: 20px; letter-spacing: 0.05em; }
+
+  /* POMPA CARD */
+  .pompa-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; }
+  .pompa-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .pompa-num { font-family: var(--font-mono); font-size: 22px; font-weight: 600; margin: 4px 0; }
+  .pompa-num.diesel { color: var(--accent-diesel); }
+  .pompa-num.verde { color: var(--accent-verde); }
+  .pompa-tot { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+
+  /* FORM */
+  .form-group { margin-bottom: 1rem; }
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; font-family: var(--font-mono); }
+  input, select, textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text); font-family: var(--font-sans); font-size: 14px; padding: 8px 10px; transition: border 0.15s; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-diesel); }
+  select option { background: var(--bg3); }
+  textarea { resize: vertical; min-height: 80px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-diesel); color: #000; border: none; border-radius: var(--radius); padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; font-family: var(--font-sans); }
+  .btn:hover { opacity: 0.85; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text); }
+  .btn-ghost:hover { border-color: var(--border2); background: var(--bg3); opacity: 1; }
+  .btn-danger { background: var(--accent-danger); color: #fff; }
+  .btn-verde { background: var(--accent-verde); color: #000; }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+  .input-hint { font-size: 11px; color: var(--muted); margin-top: 3px; font-family: var(--font-mono); }
+
+  /* TABLE */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--border); }
+  td { padding: 10px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .tag { display: inline-block; font-size: 10px; font-family: var(--font-mono); padding: 2px 8px; border-radius: 20px; letter-spacing: 0.05em; }
+  .tag-diesel { background: rgba(232,160,32,0.15); color: var(--accent-diesel); }
+  .tag-verde { background: rgba(61,184,122,0.15); color: var(--accent-verde); }
+  .tag-carico { background: rgba(74,158,222,0.12); color: var(--accent-info); }
+  .tag-scarico { background: rgba(224,82,82,0.12); color: var(--accent-danger); }
+  .mono { font-family: var(--font-mono); }
+
+  /* SECTION HEADER */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+  .section-title { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
+  .section-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: 1.5rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-family: var(--font-mono); font-size: 13px; margin-bottom: 1.25rem; color: var(--accent-diesel); }
+  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
+
+  /* CALCOLATORE CM */
+  .cm-result { background: var(--bg3); border-radius: var(--radius); padding: 10px 14px; font-family: var(--font-mono); font-size: 20px; font-weight: 600; color: var(--accent-diesel); margin-top: 8px; text-align: center; }
+
+  /* TOAST */
+  #toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 10px 16px; font-size: 13px; z-index: 999; display: none; font-family: var(--font-mono); }
+
+  /* FILE UPLOAD */
+  .file-drop { border: 1px dashed var(--border2); border-radius: var(--radius); padding: 1rem; text-align: center; cursor: pointer; transition: border 0.15s; }
+  .file-drop:hover { border-color: var(--accent-diesel); }
+  .file-drop input[type=file] { display: none; }
+  .file-list { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .file-chip { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 10px; font-size: 11px; font-family: var(--font-mono); color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .file-chip button { background: none; border: none; color: var(--accent-danger); cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* CONTATORI FILTER */
+  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
+  .filter-bar input, .filter-bar select { width: auto; flex: 1; min-width: 120px; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
+
+  .info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .label { color: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+  .info-row .value { font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">⛽ DISTRIBUTORE</div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="showPage('dashboard')">Dashboard</div>
+    <div class="nav-tab" onclick="showPage('carico')">Nuovo Carico</div>
+    <div class="nav-tab" onclick="showPage('contatori')">Contatori</div>
+    <div class="nav-tab" onclick="showPage('storico')">Storico</div>
+    <div class="nav-tab" onclick="showPage('calcolatore')">Calcolatore</div>
+  </div>
+  <div class="nav-spacer"></div>
+  <div class="nav-date" id="nav-clock"></div>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="section-header" style="margin-bottom:1.5rem">
+    <div>
+      <div class="section-title">Stato Impianto</div>
+      <div class="section-sub" id="last-update-label">—</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="openMisura()">📏 Inserisci Misura</button>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:1.5rem">
+    <div class="cisterna-card diesel" id="card-c1">
+      <div class="cisterna-label">Cisterna 1 · Pompa 3</div>
+      <div class="cisterna-name">Gasolio Piccola</div>
+      <div class="cisterna-litri diesel" id="c1-litri">—</div>
+      <div class="cisterna-unit">litri</div>
+      <div class="cisterna-cm" id="c1-cm">— cm</div>
+      <div class="cisterna-bar-wrap"><div class="cisterna-bar diesel" id="c1-bar" style="width:0%"></div></div>
+      <div class="cisterna-footer">
+        <span id="c1-pct">—</span>
+        <span>max 6.440 lt</span>
+      </div>
+    </div>
+    <div class="cisterna-card verde" id="card-c2">
+      <div class="cisterna-label">Cisterna 2 · Pompe 1/2</div>
+      <div class="cisterna-name">Verde</div>
+      <div class="cisterna-litri verde" id="c2-litri">—</div>
+      <div class="cisterna-unit">litri</div>
+      <div class="cisterna-cm" id="c2-cm">— cm</div>
+      <div class="cisterna-bar-wrap"><div class="cisterna-bar verde" id="c2-bar" style="width:0%"></div></div>
+      <div class="cisterna-footer">
+        <span id="c2-pct">—</span>
+        <span>max 12.751 lt</span>
+      </div>
+    </div>
+    <div class="cisterna-card diesel" id="card-c3">
+      <div class="cisterna-label">Cisterna 3 · Pompa 4</div>
+      <div class="cisterna-name">Gasolio Grande</div>
+      <div class="cisterna-litri diesel" id="c3-litri">—</div>
+      <div class="cisterna-unit">litri</div>
+      <div class="cisterna-cm" id="c3-cm">— cm</div>
+      <div class="cisterna-bar-wrap"><div class="cisterna-bar diesel" id="c3-bar" style="width:0%"></div></div>
+      <div class="cisterna-footer">
+        <span id="c3-pct">—</span>
+        <span>max 12.751 lt</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Contatori Pompe</div>
+    <div class="section-sub">Letture attuali</div>
+  </div>
+  <div class="grid-4" style="margin-bottom:1.5rem">
+    <div class="pompa-card">
+      <div class="pompa-label">Pompa 1 · Verde</div>
+      <div class="pompa-num verde" id="p1-tot">—</div>
+      <div class="pompa-tot">totalizzatore</div>
+    </div>
+    <div class="pompa-card">
+      <div class="pompa-label">Pompa 2 · Verde</div>
+      <div class="pompa-num verde" id="p2-tot">—</div>
+      <div class="pompa-tot">totalizzatore</div>
+    </div>
+    <div class="pompa-card">
+      <div class="pompa-label">Pompa 3 · Gasolio</div>
+      <div class="pompa-num diesel" id="p3-tot">—</div>
+      <div class="pompa-tot">totalizzatore</div>
+    </div>
+    <div class="pompa-card">
+      <div class="pompa-label">Pompa 4 · Gasolio</div>
+      <div class="pompa-num diesel" id="p4-tot">—</div>
+      <div class="pompa-tot">totalizzatore</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Ultimi Movimenti</div>
+    <table id="dashboard-table">
+      <thead><tr><th>Data/Ora</th><th>Tipo</th><th>Cisterna</th><th>Quantità</th><th>Note</th></tr></thead>
+      <tbody id="dashboard-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- NUOVO CARICO -->
+<div class="page" id="page-carico">
+  <div class="section-header">
+    <div class="section-title">Registra Carico</div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title">Dati DAS / Bolla</div>
+        <div class="form-group">
+          <label>Numero Scarico (progressivo anno)</label>
+          <input type="number" id="c-num-scarico" placeholder="es. 5" min="1">
+        </div>
+        <div class="form-group">
+          <label>Numero DAS</label>
+          <input type="text" id="c-das" placeholder="es. 26IT5452726ANO00001O9">
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="c-data">
+        </div>
+        <div class="form-group">
+          <label>Ora</label>
+          <input type="time" id="c-ora">
+        </div>
+        <div class="form-group">
+          <label>Fornitore</label>
+          <input type="text" id="c-fornitore" placeholder="es. Italiana Petroli / API Ancona">
+        </div>
+        <div class="form-group">
+          <label>Trasportatore</label>
+          <input type="text" id="c-trasportatore" placeholder="es. Transadriatico">
+        </div>
+        <div class="form-group">
+          <label>Autista</label>
+          <input type="text" id="c-autista" placeholder="es. Tessuto Raffaele Fabio">
+        </div>
+        <div class="form-group">
+          <label>Targa Mezzo</label>
+          <input type="text" id="c-targa" placeholder="es. EZ050FR / XA624NT">
+        </div>
+        <div class="form-group">
+          <label>Note</label>
+          <textarea id="c-note" placeholder="Note aggiuntive..."></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Foto DAS / Documenti</div>
+        <div class="file-drop" onclick="document.getElementById('das-file-input').click()">
+          <div style="font-size:24px;margin-bottom:4px">📎</div>
+          <div style="font-size:12px;color:var(--muted)">Tocca per allegare foto DAS</div>
+          <input type="file" id="das-file-input" accept="image/*" multiple onchange="handleFiles(this.files)">
+        </div>
+        <div class="file-list" id="file-list"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="card-title">Cisterna 1 – Gasolio Piccola (Pompa 3)</div>
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--muted);font-family:var(--font-mono)">
+          Giacenza attuale: <span id="c-c1-current" style="color:var(--accent-diesel)">—</span>
+        </div>
+        <div class="form-group">
+          <label>CM prima del carico</label>
+          <input type="number" id="c-c1-cm-pre" placeholder="cm" min="0" max="126" oninput="updateLitriCarico(1,'pre')">
+          <div class="input-hint" id="c-c1-lt-pre">→ — litri</div>
+        </div>
+        <div class="form-group">
+          <label>Litri caricati (da DAS)</label>
+          <input type="number" id="c-c1-litri" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>CM dopo il carico</label>
+          <input type="number" id="c-c1-cm-post" placeholder="cm" min="0" max="126" oninput="updateLitriCarico(1,'post')">
+          <div class="input-hint" id="c-c1-lt-post">→ — litri</div>
+        </div>
+        <div class="form-group">
+          <label>Contatore Pompa 3 al momento del carico</label>
+          <input type="number" id="c-p3-counter" placeholder="lettura contatore">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Cisterna 2 – Verde (Pompe 1/2)</div>
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--muted);font-family:var(--font-mono)">
+          Giacenza attuale: <span id="c-c2-current" style="color:var(--accent-verde)">—</span>
+        </div>
+        <div class="form-group">
+          <label>CM prima del carico</label>
+          <input type="number" id="c-c2-cm-pre" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(2,'pre')">
+          <div class="input-hint" id="c-c2-lt-pre">→ — litri</div>
+        </div>
+        <div class="form-group">
+          <label>Litri caricati (da DAS)</label>
+          <input type="number" id="c-c2-litri" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>CM dopo il carico</label>
+          <input type="number" id="c-c2-cm-post" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(2,'post')">
+          <div class="input-hint" id="c-c2-lt-post">→ — litri</div>
+        </div>
+        <div class="form-group">
+          <label>Contatori Pompa 1 + Pompa 2 al carico</label>
+          <div class="grid-2" style="gap:8px">
+            <input type="number" id="c-p1-counter" placeholder="Pompa 1">
+            <input type="number" id="c-p2-counter" placeholder="Pompa 2">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Cisterna 3 – Gasolio Grande (Pompa 4)</div>
+        <div style="background:var(--bg3);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--muted);font-family:var(--font-mono)">
+          Giacenza attuale: <span id="c-c3-current" style="color:var(--accent-diesel)">—</span>
+        </div>
+        <div class="form-group">
+          <label>CM prima del carico</label>
+          <input type="number" id="c-c3-cm-pre" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(3,'pre')">
+          <div class="input-hint" id="c-c3-lt-pre">→ — litri</div>
+        </div>
+        <div class="form-group">
+          <label>Litri caricati (da DAS)</label>
+          <input type="number" id="c-c3-litri" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>CM dopo il carico</label>
+          <input type="number" id="c-c3-cm-post" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(3,'post')">
+          <div class="input-hint" id="c-c3-lt-post">→ — litri</div>
+        </div>
+        <div class="form-group">
+          <label>Contatore Pompa 4 al momento del carico</label>
+          <input type="number" id="c-p4-counter" placeholder="lettura contatore">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn btn-ghost" onclick="clearCaricoForm()">Annulla</button>
+        <button class="btn" onclick="salvaCarico()">💾 Salva Carico</button>
+        <button class="btn btn-ghost" onclick="esportaUltimoCarico()">📄 Esporta Report</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTATORI -->
+<div class="page" id="page-contatori">
+  <div class="section-header">
+    <div class="section-title">Letture Contatori</div>
+  </div>
+
+  <div class="card" style="margin-bottom:1rem">
+    <div class="card-title">Inserisci Lettura Contatori</div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="ct-data">
+      </div>
+      <div class="form-group">
+        <label>Ora</label>
+        <input type="time" id="ct-ora">
+      </div>
+    </div>
+    <div class="grid-4">
+      <div class="form-group">
+        <label>Pompa 1 (Verde)</label>
+        <input type="number" id="ct-p1" placeholder="0000000">
+      </div>
+      <div class="form-group">
+        <label>Pompa 2 (Verde)</label>
+        <input type="number" id="ct-p2" placeholder="0000000">
+      </div>
+      <div class="form-group">
+        <label>Pompa 3 (Gasolio)</label>
+        <input type="number" id="ct-p3" placeholder="0000000">
+      </div>
+      <div class="form-group">
+        <label>Pompa 4 (Gasolio)</label>
+        <input type="number" id="ct-p4" placeholder="0000000">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="salvaContatori()">💾 Salva Lettura</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Storico Contatori</div>
+    <div class="filter-bar">
+      <input type="date" id="ct-filter-da" placeholder="Da">
+      <input type="date" id="ct-filter-a" placeholder="A">
+      <select id="ct-filter-pompa">
+        <option value="">Tutte le pompe</option>
+        <option value="1">Pompa 1</option>
+        <option value="2">Pompa 2</option>
+        <option value="3">Pompa 3</option>
+        <option value="4">Pompa 4</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="renderContatori()">Filtra</button>
+      <button class="btn btn-ghost btn-sm" onclick="filterFromLastCarico()">Da ultimo carico</button>
+    </div>
+    <table>
+      <thead><tr><th>Data/Ora</th><th>P1 Verde</th><th>P2 Verde</th><th>P3 Gasolio</th><th>P4 Gasolio</th><th>Δ Erogato</th></tr></thead>
+      <tbody id="contatori-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- STORICO -->
+<div class="page" id="page-storico">
+  <div class="section-header">
+    <div class="section-title">Storico Movimenti</div>
+  </div>
+  <div class="card">
+    <table>
+      <thead><tr><th>#</th><th>Data/Ora</th><th>Tipo</th><th>DAS/Ref</th><th>C1 Gas.P</th><th>C2 Verde</th><th>C3 Gas.G</th><th>Azioni</th></tr></thead>
+      <tbody id="storico-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CALCOLATORE -->
+<div class="page" id="page-calcolatore">
+  <div class="section-header">
+    <div class="section-title">Calcolatore CM → Litri</div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Conversione</div>
+      <div class="form-group">
+        <label>Cisterna</label>
+        <select id="calc-cisterna">
+          <option value="1">Cisterna 1 – Gasolio Piccola (max 126 cm)</option>
+          <option value="2">Cisterna 2 – Verde (max 159 cm)</option>
+          <option value="3">Cisterna 3 – Gasolio Grande (max 159 cm)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Altezza (cm)</label>
+        <input type="number" id="calc-cm" placeholder="es. 75" min="1" oninput="calcolaConversione()">
+      </div>
+      <div class="cm-result" id="calc-result">— litri</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Info Cisterne</div>
+      <div style="font-size:13px;color:var(--muted);line-height:2">
+        <div><span style="color:var(--accent-diesel)">■</span> Cisterna 1 – Gasolio Piccola</div>
+        <div style="margin-left:1rem;font-family:var(--font-mono);font-size:11px">Cap. 6.200 lt · Ø 1.270 m · L 5.000 m · tabella 1–126 cm</div>
+        <div style="margin-top:8px"><span style="color:var(--accent-verde)">■</span> Cisterna 2 – Verde</div>
+        <div style="margin-left:1rem;font-family:var(--font-mono);font-size:11px">Cap. 12.600 lt · Ø 1.600 m · L 6.200 m · tabella 1–159 cm</div>
+        <div style="margin-top:8px"><span style="color:var(--accent-diesel)">■</span> Cisterna 3 – Gasolio Grande</div>
+        <div style="margin-left:1rem;font-family:var(--font-mono);font-size:11px">Cap. 12.600 lt · Ø 1.600 m · L 6.200 m · tabella 1–159 cm</div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
+          <span style="color:var(--accent-danger)">⚠</span> Soglia allarme: <span style="font-family:var(--font-mono)">1.800 litri</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MISURA -->
+<div class="modal-overlay" id="modal-misura">
+  <div class="modal">
+    <div class="modal-title">📏 Inserisci Misura Cisterne</div>
+    <div class="form-group">
+      <label>Data</label><input type="date" id="m-data">
+    </div>
+    <div class="form-group">
+      <label>Ora</label><input type="time" id="m-ora">
+    </div>
+    <hr class="divider">
+    <div class="form-group">
+      <label>Cisterna 1 – Gasolio Piccola (cm)</label>
+      <input type="number" id="m-c1" placeholder="cm" min="0" max="126" oninput="updateMisuraHint(1)">
+      <div class="input-hint" id="m-c1-hint">→ — litri</div>
+    </div>
+    <div class="form-group">
+      <label>Cisterna 2 – Verde (cm)</label>
+      <input type="number" id="m-c2" placeholder="cm" min="0" max="159" oninput="updateMisuraHint(2)">
+      <div class="input-hint" id="m-c2-hint">→ — litri</div>
+    </div>
+    <div class="form-group">
+      <label>Cisterna 3 – Gasolio Grande (cm)</label>
+      <input type="number" id="m-c3" placeholder="cm" min="0" max="159" oninput="updateMisuraHint(3)">
+      <div class="input-hint" id="m-c3-hint">→ — litri</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-misura')">Annulla</button>
+      <button class="btn" onclick="salvaMisura()">Salva Misura</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL REPORT -->
+<div class="modal-overlay" id="modal-report">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-title">📄 Report Carico – Scarico #<span id="report-num">—</span></div>
+    <div id="report-content" style="font-family:var(--font-mono);font-size:12px;line-height:1.8;white-space:pre-wrap;background:var(--bg3);border-radius:var(--radius);padding:1rem;color:var(--text);max-height:60vh;overflow-y:auto"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-report')">Chiudi</button>
+      <button class="btn" onclick="copyReport()">📋 Copia Testo</button>
+      <button class="btn btn-verde" onclick="downloadReport()">⬇️ Scarica TXT</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// TABELLE DI TARATURA
+// ============================================================
+const TAB1 = {1:10,2:27,3:46,4:69,5:94,6:121,7:151,8:183,9:215,10:250,11:287,12:325,13:364,14:404,15:446,16:488,17:533,18:578,19:624,20:672,21:719,22:768,23:818,24:869,25:920,26:972,27:1025,28:1079,29:1133,30:1188,31:1244,32:1299,33:1357,34:1413,35:1472,36:1530,37:1589,38:1647,39:1707,40:1768,41:1828,42:1889,43:1950,44:2011,45:2073,46:2135,47:2198,48:2261,49:2324,50:2386,51:2450,52:2513,53:2577,54:2641,55:2705,56:2769,57:2834,58:2898,59:2963,60:3027,61:3092,62:3157,63:3221,64:3286,65:3350,66:3415,67:3480,68:3544,69:3609,70:3673,71:3737,72:3801,73:3865,74:3929,75:3993,76:4056,77:4119,78:4183,79:4244,80:4307,81:4369,82:4431,83:4493,84:4554,85:4615,86:4675,87:4735,88:4795,89:4855,90:4913,91:4972,92:5029,93:5087,94:5143,95:5199,96:5255,97:5310,98:5364,99:5417,100:5470,101:5522,102:5575,103:5624,104:5674,105:5723,106:5772,107:5818,108:5865,109:5909,110:5954,111:5997,112:6038,113:6079,114:6119,115:6156,116:6192,117:6227,118:6261,119:6292,120:6321,121:6348,122:6373,123:6396,124:6416,125:6432,126:6440};
+const TAB23 = {1:15,2:37,3:65,4:96,5:132,6:171,7:213,8:257,9:303,10:352,11:403,12:457,13:513,14:570,15:629,16:690,17:753,18:817,19:883,20:954,21:1018,22:1088,23:1159,24:1232,25:1306,26:1381,27:1457,28:1534,29:1612,30:1692,31:1771,32:1853,33:1935,34:2018,35:2102,36:2186,37:2272,38:2359,39:2446,40:2534,41:2623,42:2712,43:2801,44:2892,45:2984,46:3076,47:3169,48:3261,49:3355,50:3449,51:3544,52:3639,53:3735,54:3831,55:3927,56:4029,57:4121,58:4218,59:4316,60:4415,61:4513,62:4612,63:4712,64:4811,65:4911,66:5011,67:5111,68:5212,69:5312,70:5413,71:5514,72:5615,73:5716,74:5817,75:5919,76:6020,77:6121,78:6223,79:6324,80:6426,81:6528,82:6628,83:6730,84:6891,85:6932,86:7034,87:7135,88:7236,89:7337,90:7437,91:7538,92:7638,93:7739,94:7839,95:7938,96:8038,97:8137,98:8236,99:8335,100:8433,101:8531,102:8629,103:8726,104:8823,105:8919,106:9015,107:9111,108:9206,109:9301,110:9395,111:9489,112:9581,113:9674,114:9766,115:9857,116:9948,117:10037,118:10127,119:10216,120:10304,121:10390,122:10477,123:10563,124:10647,125:10732,126:10815,127:10897,128:10978,129:11058,130:11138,131:11215,132:11293,133:11368,134:11444,135:11517,136:11590,137:11661,138:11732,139:11800,140:11867,141:11932,142:11997,143:12059,144:12120,145:12179,146:12236,147:12299,148:12346,149:12398,150:12447,151:12493,152:12537,153:12579,154:12617,155:12653,156:12684,157:12712,158:12734,159:12751};
+
+const MAX_LT = {1:6440, 2:12751, 3:12751};
+const SOGLIA = 1800;
+
+function cmToLitri(cisterna, cm) {
+  const tab = cisterna === 1 ? TAB1 : TAB23;
+  const c = Math.round(cm);
+  if (c <= 0) return 0;
+  if (tab[c]) return tab[c];
+  const maxCm = cisterna === 1 ? 126 : 159;
+  if (c >= maxCm) return MAX_LT[cisterna];
+  // interpolazione lineare
+  const lo = Math.floor(c), hi = Math.ceil(c);
+  if (tab[lo] && tab[hi]) return Math.round(tab[lo] + (tab[hi]-tab[lo])*(c-lo)/(hi-lo));
+  return null;
+}
+
+// ============================================================
+// STORAGE
+// ============================================================
+function loadData() {
+  return JSON.parse(localStorage.getItem('distributore_data') || 'null') || getInitialData();
+}
+function saveData(d) { localStorage.setItem('distributore_data', JSON.stringify(d)); }
+
+function getInitialData() {
+  return {
+    cisterne: {
+      1: { cm: 113, litri: 6079 },
+      2: { cm: 74, litri: 5817 },
+      3: { cm: 122, litri: 10477 }
+    },
+    contatori: {
+      p1: 1202396, p2: 1409854, p3: 571457, p4: 78066
+    },
+    carichi: [{
+      id: 1,
+      num_scarico: 5,
+      das: '26IT5452726ANO00001O9',
+      data: '2026-05-11',
+      ora: '06:45',
+      fornitore: 'Italiana Petroli / API Raffineria Ancona',
+      trasportatore: 'Transadriatico Soc. Cooperativa',
+      autista: 'Tessuto Raffaele Fabio',
+      targa: 'EZ050FR / XA624NT',
+      note: 'Piano carico: 5417',
+      c1: { litri_pre: 3027, cm_pre: 60, litri_caricati: 3000, litri_post: 6079, cm_post: 113 },
+      c2: { litri_pre: 883, cm_pre: 19, litri_caricati: 5000, litri_post: 5817, cm_post: 74 },
+      c3: { litri_pre: 5413, cm_pre: 70, litri_caricati: 5000, litri_post: 10477, cm_post: 122 },
+      contatori: { p1: 1202396, p2: 1409854, p3: 571457, p4: 78066 },
+      files: []
+    }],
+    misure: [],
+    letture_contatori: []
+  };
+}
+
+let DATA = loadData();
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => { if(t.textContent.toLowerCase().includes(id.replace('dashboard','dashboard').replace('carico','carico').replace('contatori','contatori').replace('storico','storico').replace('calcolatore','calcolatore'))) t.classList.add('active'); });
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'storico') renderStorico();
+  if (id === 'contatori') renderContatori();
+  if (id === 'carico') populateCaricoDefaults();
+}
+
+// ============================================================
+// CLOCK
+// ============================================================
+function updateClock() {
+  const n = new Date();
+  document.getElementById('nav-clock').textContent = n.toLocaleDateString('it-IT') + ' ' + n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock, 1000); updateClock();
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard() {
+  const d = DATA;
+  [1,2,3].forEach(i => {
+    const c = d.cisterne[i];
+    const lt = c.litri;
+    const max = MAX_LT[i];
+    const pct = Math.round(lt / max * 100);
+    const tipo = i === 2 ? 'verde' : 'diesel';
+    const isAlert = lt < SOGLIA;
+    const card = document.getElementById('card-c' + i);
+    card.classList.toggle('alert', isAlert);
+    const litriEl = document.getElementById('c' + i + '-litri');
+    litriEl.textContent = lt.toLocaleString('it-IT');
+    litriEl.className = 'cisterna-litri ' + (isAlert ? 'alert' : tipo);
+    document.getElementById('c' + i + '-cm').textContent = c.cm + ' cm';
+    document.getElementById('c' + i + '-bar').style.width = pct + '%';
+    document.getElementById('c' + i + '-bar').className = 'cisterna-bar ' + (isAlert ? 'alert' : tipo);
+    document.getElementById('c' + i + '-pct').textContent = pct + '%';
+    let badge = card.querySelector('.badge-alert');
+    if (isAlert) { if (!badge) { badge = document.createElement('div'); badge.className = 'badge-alert'; badge.textContent = 'SOTTO SOGLIA'; card.appendChild(badge); } }
+    else { if (badge) badge.remove(); }
+  });
+  const ct = d.contatori;
+  ['p1','p2','p3','p4'].forEach((p,i) => {
+    document.getElementById(p + '-tot').textContent = ct[p].toLocaleString('it-IT');
+  });
+
+  // last update
+  const allEvents = [];
+  d.carichi.forEach(c => allEvents.push({dt: c.data + 'T' + c.ora, tipo:'carico', ref: 'DAS ' + c.das, c1: '+'+c.c1.litri_caricati+'lt', c2: '+'+c.c2.litri_caricati+'lt', c3: '+'+c.c3.litri_caricati+'lt', note: 'Scarico #'+c.num_scarico}));
+  d.misure.forEach(m => allEvents.push({dt: m.data + 'T' + m.ora, tipo:'misura', ref:'Misura manuale', c1: m.c1?m.c1+'cm / '+cmToLitri(1,m.c1)+'lt':'—', c2: m.c2?m.c2+'cm / '+cmToLitri(2,m.c2)+'lt':'—', c3: m.c3?m.c3+'cm / '+cmToLitri(3,m.c3)+'lt':'—', note:''}));
+  allEvents.sort((a,b) => b.dt.localeCompare(a.dt));
+
+  const tbody = document.getElementById('dashboard-tbody');
+  tbody.innerHTML = '';
+  allEvents.slice(0,8).forEach(e => {
+    const tr = document.createElement('tr');
+    const dt = e.dt.replace('T',' ');
+    const tipoTag = e.tipo==='carico'?'<span class="tag tag-carico">carico</span>':'<span class="tag" style="background:rgba(136,136,136,0.12);color:var(--muted)">misura</span>';
+    tr.innerHTML = `<td class="mono" style="font-size:11px">${dt}</td><td>${tipoTag}</td><td style="font-size:11px">${e.ref}</td><td style="font-size:11px;font-family:var(--font-mono)">C1:${e.c1} C2:${e.c2} C3:${e.c3}</td><td style="font-size:11px;color:var(--muted)">${e.note}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  if (allEvents.length > 0) {
+    const last = allEvents[0];
+    document.getElementById('last-update-label').textContent = 'Ultimo aggiornamento: ' + last.dt.replace('T',' ');
+  }
+}
+
+// ============================================================
+// MISURA SALTUARIA
+// ============================================================
+function openMisura() {
+  const now = new Date();
+  document.getElementById('m-data').value = now.toISOString().slice(0,10);
+  document.getElementById('m-ora').value = now.toTimeString().slice(0,5);
+  document.getElementById('modal-misura').classList.add('open');
+}
+function updateMisuraHint(n) {
+  const v = parseInt(document.getElementById('m-c'+n).value);
+  const hint = document.getElementById('m-c'+n+'-hint');
+  if (!isNaN(v) && v > 0) {
+    const lt = cmToLitri(n, v);
+    hint.textContent = lt !== null ? '→ ' + lt.toLocaleString('it-IT') + ' litri' : '→ fuori range';
+  } else hint.textContent = '→ — litri';
+}
+function salvaMisura() {
+  const data = document.getElementById('m-data').value;
+  const ora = document.getElementById('m-ora').value;
+  const c1 = document.getElementById('m-c1').value;
+  const c2 = document.getElementById('m-c2').value;
+  const c3 = document.getElementById('m-c3').value;
+  if (!data || !ora) { showToast('Inserisci data e ora'); return; }
+  const m = { data, ora, c1: c1?parseInt(c1):null, c2: c2?parseInt(c2):null, c3: c3?parseInt(c3):null };
+  DATA.misure.push(m);
+  if (c1) { DATA.cisterne[1] = { cm: parseInt(c1), litri: cmToLitri(1, parseInt(c1)) }; }
+  if (c2) { DATA.cisterne[2] = { cm: parseInt(c2), litri: cmToLitri(2, parseInt(c2)) }; }
+  if (c3) { DATA.cisterne[3] = { cm: parseInt(c3), litri: cmToLitri(3, parseInt(c3)) }; }
+  saveData(DATA);
+  closeModal('modal-misura');
+  renderDashboard();
+  showToast('Misura salvata');
+  ['m-c1','m-c2','m-c3'].forEach(id => document.getElementById(id).value = '');
+}
+
+// ============================================================
+// CARICO
+// ============================================================
+function populateCaricoDefaults() {
+  const now = new Date();
+  document.getElementById('c-data').value = now.toISOString().slice(0,10);
+  document.getElementById('c-ora').value = now.toTimeString().slice(0,5);
+  const nextNum = DATA.carichi.length > 0 ? Math.max(...DATA.carichi.map(c => c.num_scarico)) + 1 : 1;
+  document.getElementById('c-num-scarico').value = nextNum;
+  document.getElementById('c-c1-current').textContent = DATA.cisterne[1].litri.toLocaleString('it-IT') + ' lt (' + DATA.cisterne[1].cm + ' cm)';
+  document.getElementById('c-c2-current').textContent = DATA.cisterne[2].litri.toLocaleString('it-IT') + ' lt (' + DATA.cisterne[2].cm + ' cm)';
+  document.getElementById('c-c3-current').textContent = DATA.cisterne[3].litri.toLocaleString('it-IT') + ' lt (' + DATA.cisterne[3].cm + ' cm)';
+}
+
+function updateLitriCarico(n, when) {
+  const id = 'c-c' + n + '-cm-' + when;
+  const hintId = 'c-c' + n + '-lt-' + when;
+  const v = parseInt(document.getElementById(id).value);
+  const hint = document.getElementById(hintId);
+  if (!isNaN(v) && v > 0) {
+    const lt = cmToLitri(n, v);
+    hint.textContent = lt !== null ? '→ ' + lt.toLocaleString('it-IT') + ' litri' : '→ fuori range';
+  } else hint.textContent = '→ — litri';
+}
+
+let pendingFiles = [];
+function handleFiles(files) {
+  for (const f of files) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      pendingFiles.push({ name: f.name, data: e.target.result });
+      renderFileList();
+    };
+    reader.readAsDataURL(f);
+  }
+}
+function renderFileList() {
+  const fl = document.getElementById('file-list');
+  fl.innerHTML = '';
+  pendingFiles.forEach((f, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'file-chip';
+    chip.innerHTML = `📎 ${f.name} <button onclick="removeFile(${i})">×</button>`;
+    fl.appendChild(chip);
+  });
+}
+function removeFile(i) { pendingFiles.splice(i, 1); renderFileList(); }
+
+function salvaCarico() {
+  const numScarico = parseInt(document.getElementById('c-num-scarico').value);
+  const das = document.getElementById('c-das').value;
+  const data = document.getElementById('c-data').value;
+  const ora = document.getElementById('c-ora').value;
+  if (!data || !ora || !numScarico) { showToast('Inserisci almeno numero scarico, data e ora'); return; }
+
+  const getCm = (id) => { const v = document.getElementById(id).value; return v ? parseInt(v) : null; };
+  const getLt = (id) => { const v = document.getElementById(id).value; return v ? parseInt(v) : 0; };
+
+  const c1cmPre = getCm('c-c1-cm-pre'), c1cmPost = getCm('c-c1-cm-post');
+  const c2cmPre = getCm('c-c2-cm-pre'), c2cmPost = getCm('c-c2-cm-post');
+  const c3cmPre = getCm('c-c3-cm-pre'), c3cmPost = getCm('c-c3-cm-post');
+
+  const carico = {
+    id: Date.now(),
+    num_scarico: numScarico,
+    das,
+    data,
+    ora,
+    fornitore: document.getElementById('c-fornitore').value,
+    trasportatore: document.getElementById('c-trasportatore').value,
+    autista: document.getElementById('c-autista').value,
+    targa: document.getElementById('c-targa').value,
+    note: document.getElementById('c-note').value,
+    c1: {
+      cm_pre: c1cmPre,
+      litri_pre: c1cmPre ? cmToLitri(1, c1cmPre) : null,
+      litri_caricati: getLt('c-c1-litri'),
+      cm_post: c1cmPost,
+      litri_post: c1cmPost ? cmToLitri(1, c1cmPost) : null
+    },
+    c2: {
+      cm_pre: c2cmPre,
+      litri_pre: c2cmPre ? cmToLitri(2, c2cmPre) : null,
+      litri_caricati: getLt('c-c2-litri'),
+      cm_post: c2cmPost,
+      litri_post: c2cmPost ? cmToLitri(2, c2cmPost) : null
+    },
+    c3: {
+      cm_pre: c3cmPre,
+      litri_pre: c3cmPre ? cmToLitri(3, c3cmPre) : null,
+      litri_caricati: getLt('c-c3-litri'),
+      cm_post: c3cmPost,
+      litri_post: c3cmPost ? cmToLitri(3, c3cmPost) : null
+    },
+    contatori: {
+      p1: getLt('c-p1-counter') || DATA.contatori.p1,
+      p2: getLt('c-p2-counter') || DATA.contatori.p2,
+      p3: getLt('c-p3-counter') || DATA.contatori.p3,
+      p4: getLt('c-p4-counter') || DATA.contatori.p4
+    },
+    files: [...pendingFiles]
+  };
+
+  // Aggiorna stato cisterne
+  if (c1cmPost) DATA.cisterne[1] = { cm: c1cmPost, litri: cmToLitri(1, c1cmPost) };
+  if (c2cmPost) DATA.cisterne[2] = { cm: c2cmPost, litri: cmToLitri(2, c2cmPost) };
+  if (c3cmPost) DATA.cisterne[3] = { cm: c3cmPost, litri: cmToLitri(3, c3cmPost) };
+  if (carico.contatori.p1) DATA.contatori.p1 = carico.contatori.p1;
+  if (carico.contatori.p2) DATA.contatori.p2 = carico.contatori.p2;
+  if (carico.contatori.p3) DATA.contatori.p3 = carico.contatori.p3;
+  if (carico.contatori.p4) DATA.contatori.p4 = carico.contatori.p4;
+
+  DATA.carichi.push(carico);
+  saveData(DATA);
+  pendingFiles = [];
+  renderFileList();
+  showToast('Carico #' + numScarico + ' salvato');
+  generaReport(carico);
+}
+
+function clearCaricoForm() {
+  ['c-num-scarico','c-das','c-fornitore','c-trasportatore','c-autista','c-targa','c-note',
+   'c-c1-cm-pre','c-c1-litri','c-c1-cm-post','c-c2-cm-pre','c-c2-litri','c-c2-cm-post',
+   'c-c3-cm-pre','c-c3-litri','c-c3-cm-post','c-p1-counter','c-p2-counter','c-p3-counter','c-p4-counter'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  pendingFiles = [];
+  renderFileList();
+}
+
+// ============================================================
+// CONTATORI
+// ============================================================
+function salvaContatori() {
+  const data = document.getElementById('ct-data').value;
+  const ora = document.getElementById('ct-ora').value;
+  if (!data || !ora) { showToast('Inserisci data e ora'); return; }
+  const lettura = {
+    data, ora,
+    p1: document.getElementById('ct-p1').value ? parseInt(document.getElementById('ct-p1').value) : null,
+    p2: document.getElementById('ct-p2').value ? parseInt(document.getElementById('ct-p2').value) : null,
+    p3: document.getElementById('ct-p3').value ? parseInt(document.getElementById('ct-p3').value) : null,
+    p4: document.getElementById('ct-p4').value ? parseInt(document.getElementById('ct-p4').value) : null,
+  };
+  DATA.letture_contatori.push(lettura);
+  if (lettura.p1 !== null) DATA.contatori.p1 = lettura.p1;
+  if (lettura.p2 !== null) DATA.contatori.p2 = lettura.p2;
+  if (lettura.p3 !== null) DATA.contatori.p3 = lettura.p3;
+  if (lettura.p4 !== null) DATA.contatori.p4 = lettura.p4;
+  saveData(DATA);
+  renderContatori();
+  showToast('Lettura contatori salvata');
+  ['ct-p1','ct-p2','ct-p3','ct-p4'].forEach(id => document.getElementById(id).value = '');
+}
+
+function filterFromLastCarico() {
+  if (DATA.carichi.length === 0) { showToast('Nessun carico registrato'); return; }
+  const lastCarico = DATA.carichi[DATA.carichi.length-1];
+  document.getElementById('ct-filter-da').value = lastCarico.data;
+  renderContatori();
+}
+
+function renderContatori() {
+  const da = document.getElementById('ct-filter-da').value;
+  const a = document.getElementById('ct-filter-a').value;
+  const pompa = document.getElementById('ct-filter-pompa').value;
+
+  let rows = [...DATA.letture_contatori];
+  // Aggiungi anche letture dai carichi
+  DATA.carichi.forEach(c => {
+    if (c.contatori) rows.push({ data: c.data, ora: c.ora, p1: c.contatori.p1, p2: c.contatori.p2, p3: c.contatori.p3, p4: c.contatori.p4, _from: 'carico #'+c.num_scarico });
+  });
+  rows.sort((a,b) => (a.data+'T'+a.ora).localeCompare(b.data+'T'+b.ora));
+
+  if (da) rows = rows.filter(r => r.data >= da);
+  if (a) rows = rows.filter(r => r.data <= a);
+
+  const tbody = document.getElementById('contatori-tbody');
+  tbody.innerHTML = '';
+
+  rows.forEach((r, idx) => {
+    const prev = idx > 0 ? rows[idx-1] : null;
+    const deltaP = (p) => {
+      if (!prev || prev[p] === null || r[p] === null) return '—';
+      let d = r[p] - prev[p];
+      if (d < 0) d += 9999999; // reset
+      return '+' + d.toLocaleString('it-IT');
+    };
+    const tr = document.createElement('tr');
+    const highlight = pompa ? '' : '';
+    const fmt = (v) => v !== null && v !== undefined ? v.toLocaleString('it-IT') : '—';
+    tr.innerHTML = `
+      <td class="mono" style="font-size:11px">${r.data} ${r.ora}${r._from?' <span style="color:var(--muted);font-size:10px">('+r._from+')</span>':''}</td>
+      <td class="mono" style="font-size:12px;color:var(--accent-verde)">${fmt(r.p1)}</td>
+      <td class="mono" style="font-size:12px;color:var(--accent-verde)">${fmt(r.p2)}</td>
+      <td class="mono" style="font-size:12px;color:var(--accent-diesel)">${fmt(r.p3)}</td>
+      <td class="mono" style="font-size:12px;color:var(--accent-diesel)">${fmt(r.p4)}</td>
+      <td style="font-size:11px;color:var(--muted)">P1:${deltaP('p1')} P2:${deltaP('p2')} P3:${deltaP('p3')} P4:${deltaP('p4')}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ============================================================
+// STORICO
+// ============================================================
+function renderStorico() {
+  const tbody = document.getElementById('storico-tbody');
+  tbody.innerHTML = '';
+  const events = [...DATA.carichi].sort((a,b) => (b.data+'T'+b.ora).localeCompare(a.data+'T'+a.ora));
+  events.forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="mono" style="font-size:11px">#${c.num_scarico}</td>
+      <td class="mono" style="font-size:11px">${c.data} ${c.ora}</td>
+      <td><span class="tag tag-carico">carico</span></td>
+      <td style="font-size:11px;color:var(--muted)">${c.das||'—'}</td>
+      <td style="font-size:11px;font-family:var(--font-mono)">+${c.c1.litri_caricati} lt</td>
+      <td style="font-size:11px;font-family:var(--font-mono)">+${c.c2.litri_caricati} lt</td>
+      <td style="font-size:11px;font-family:var(--font-mono)">+${c.c3.litri_caricati} lt</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="generaReportById(${c.id})">📄 Report</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// ============================================================
+// CALCOLATORE
+// ============================================================
+function calcolaConversione() {
+  const cist = parseInt(document.getElementById('calc-cisterna').value);
+  const cm = parseFloat(document.getElementById('calc-cm').value);
+  const res = document.getElementById('calc-result');
+  if (isNaN(cm) || cm <= 0) { res.textContent = '— litri'; return; }
+  const lt = cmToLitri(cist, cm);
+  res.textContent = lt !== null ? lt.toLocaleString('it-IT') + ' litri' : 'Fuori range';
+}
+
+// ============================================================
+// REPORT
+// ============================================================
+let currentReportText = '';
+
+function buildReportText(carico) {
+  const line = (label, val) => label.padEnd(32, '.') + ' ' + val;
+  const sep = '═'.repeat(56);
+  const sep2 = '─'.repeat(56);
+  const fmtCisterna = (label, c) => {
+    const lines = [];
+    lines.push('  ' + label.toUpperCase());
+    lines.push('  ' + sep2);
+    if (c.cm_pre !== null)
+      lines.push('  ' + line('Prima del carico', (c.cm_pre||'—') + ' cm = ' + (c.litri_pre||'—').toLocaleString('it-IT') + ' litri'));
+    lines.push('  ' + line('Litri caricati (DAS)', '+' + (c.litri_caricati||0).toLocaleString('it-IT') + ' litri'));
+    if (c.cm_post !== null)
+      lines.push('  ' + line('Dopo il carico', (c.cm_post||'—') + ' cm = ' + (c.litri_post||'—').toLocaleString('it-IT') + ' litri'));
+    return lines.join('\n');
+  };
+
+  return [
+    sep,
+    '  REPORT CARICO CARBURANTI',
+    '  Stazione di Servizio Borsella Marco – Castelfidardo',
+    sep,
+    '',
+    line('  Numero Scarico', '#' + carico.num_scarico),
+    line('  Numero DAS', carico.das || '—'),
+    line('  Data', carico.data + ' ore ' + carico.ora),
+    line('  Fornitore', carico.fornitore || '—'),
+    line('  Trasportatore', carico.trasportatore || '—'),
+    line('  Autista', carico.autista || '—'),
+    line('  Targa', carico.targa || '—'),
+    carico.note ? line('  Note', carico.note) : '',
+    '',
+    sep,
+    '  LETTURE CONTATORI AL CARICO',
+    sep2,
+    '  ' + line('Pompa 1 (Verde)', (carico.contatori.p1||'—').toLocaleString('it-IT')),
+    '  ' + line('Pompa 2 (Verde)', (carico.contatori.p2||'—').toLocaleString('it-IT')),
+    '  ' + line('Pompa 3 (Gasolio)', (carico.contatori.p3||'—').toLocaleString('it-IT')),
+    '  ' + line('Pompa 4 (Gasolio)', (carico.contatori.p4||'—').toLocaleString('it-IT')),
+    '',
+    sep,
+    '  CISTERNE',
+    sep,
+    fmtCisterna('Cisterna 1 – Gasolio Piccola (Pompa 3)', carico.c1),
+    '',
+    fmtCisterna('Cisterna 2 – Verde (Pompe 1/2)', carico.c2),
+    '',
+    fmtCisterna('Cisterna 3 – Gasolio Grande (Pompa 4)', carico.c3),
+    '',
+    sep,
+    '  Report generato il ' + new Date().toLocaleString('it-IT'),
+    sep
+  ].filter(l => l !== undefined).join('\n');
+}
+
+function generaReport(carico) {
+  currentReportText = buildReportText(carico);
+  document.getElementById('report-num').textContent = carico.num_scarico;
+  document.getElementById('report-content').textContent = currentReportText;
+  document.getElementById('modal-report').classList.add('open');
+}
+
+function generaReportById(id) {
+  const c = DATA.carichi.find(x => x.id === id);
+  if (c) generaReport(c);
+}
+
+function esportaUltimoCarico() {
+  if (DATA.carichi.length === 0) { showToast('Nessun carico salvato'); return; }
+  generaReport(DATA.carichi[DATA.carichi.length - 1]);
+}
+
+function copyReport() {
+  navigator.clipboard.writeText(currentReportText).then(() => showToast('Copiato!'));
+}
+
+function downloadReport() {
+  const blob = new Blob([currentReportText], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'scarico_' + (document.getElementById('report-num').textContent) + '_' + new Date().toISOString().slice(0,10) + '.txt';
+  a.click();
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 2500);
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// Init
+renderDashboard();
+const now = new Date();
+document.getElementById('ct-data').value = now.toISOString().slice(0,10);
+document.getElementById('ct-ora').value = now.toTimeString().slice(0,5);
+</script>
+</body>
+</html>
