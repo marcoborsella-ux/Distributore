@@ -4,155 +4,149 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Distributore – Gestione Carburanti</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Distributore">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0f0f0f;
-    --bg2: #181818;
-    --bg3: #222;
-    --border: #2e2e2e;
-    --border2: #3a3a3a;
-    --text: #e8e8e8;
-    --muted: #888;
-    --accent-diesel: #e8a020;
-    --accent-verde: #3db87a;
-    --accent-danger: #e05252;
-    --accent-info: #4a9ede;
-    --font-mono: 'IBM Plex Mono', monospace;
-    --font-sans: 'IBM Plex Sans', sans-serif;
-    --radius: 6px;
-    --radius-lg: 10px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 14px; min-height: 100vh; }
+  :root{--bg:#0f0f0f;--bg2:#181818;--bg3:#222;--border:#2e2e2e;--border2:#3a3a3a;--text:#e8e8e8;--muted:#888;--accent-diesel:#e8a020;--accent-verde:#3db87a;--accent-danger:#e05252;--accent-info:#4a9ede;--font-mono:'IBM Plex Mono',monospace;--font-sans:'IBM Plex Sans',sans-serif;--radius:6px;--radius-lg:10px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;min-height:100vh;}
+  nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;position:sticky;top:0;z-index:100;overflow-x:auto;}
+  .nav-brand{font-family:var(--font-mono);font-size:13px;color:var(--accent-diesel);padding:1rem 1.5rem 1rem 0;border-right:1px solid var(--border);margin-right:1rem;letter-spacing:0.05em;white-space:nowrap;}
+  .nav-tabs{display:flex;}
+  .nav-tab{padding:1rem 1.1rem;cursor:pointer;color:var(--muted);font-size:13px;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;}
+  .nav-tab:hover{color:var(--text);}
+  .nav-tab.active{color:var(--text);border-bottom-color:var(--accent-diesel);}
+  .nav-spacer{flex:1;min-width:12px;}
+  .nav-right{display:flex;align-items:center;gap:12px;}
+  .nav-date{font-family:var(--font-mono);font-size:11px;color:var(--muted);white-space:nowrap;}
+  .drive-status{font-family:var(--font-mono);font-size:11px;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+  .drive-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
+  .drive-dot.ok{background:var(--accent-verde);}
+  .drive-dot.err{background:var(--accent-danger);}
+  .drive-dot.sync{background:var(--accent-diesel);animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
 
-  /* NAV */
-  nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 1.5rem; display: flex; align-items: center; gap: 0; position: sticky; top: 0; z-index: 100; }
-  .nav-brand { font-family: var(--font-mono); font-size: 13px; color: var(--accent-diesel); padding: 1rem 1.5rem 1rem 0; border-right: 1px solid var(--border); margin-right: 1rem; letter-spacing: 0.05em; white-space: nowrap; }
-  .nav-tabs { display: flex; gap: 0; }
-  .nav-tab { padding: 1rem 1.2rem; cursor: pointer; color: var(--muted); font-size: 13px; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
-  .nav-tab:hover { color: var(--text); }
-  .nav-tab.active { color: var(--text); border-bottom-color: var(--accent-diesel); }
-  .nav-spacer { flex: 1; }
-  .nav-date { font-family: var(--font-mono); font-size: 11px; color: var(--muted); padding: 0 0 0 1rem; }
+  .page{display:none;padding:1.25rem;max-width:1100px;margin:0 auto;}
+  .page.active{display:block;}
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+  .card-title{font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:1rem;}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;}
+  .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+  @media(max-width:700px){.grid-3,.grid-4{grid-template-columns:1fr;}.grid-2{grid-template-columns:1fr;}}
 
-  /* LAYOUT */
-  .page { display: none; padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
-  .page.active { display: block; }
+  .cisterna-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;position:relative;overflow:hidden;}
+  .cisterna-card.diesel{border-top:3px solid var(--accent-diesel);}
+  .cisterna-card.verde{border-top:3px solid var(--accent-verde);}
+  .cisterna-card.alert{border-color:var(--accent-danger)!important;}
+  .cisterna-label{font-family:var(--font-mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;}
+  .cisterna-name{font-size:16px;font-weight:500;margin-bottom:1rem;}
+  .cisterna-litri{font-family:var(--font-mono);font-size:32px;font-weight:600;line-height:1;}
+  .cisterna-litri.diesel{color:var(--accent-diesel);}
+  .cisterna-litri.verde{color:var(--accent-verde);}
+  .cisterna-litri.alert{color:var(--accent-danger);}
+  .cisterna-unit{font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-top:4px;}
+  .cisterna-cm{font-family:var(--font-mono);font-size:13px;color:var(--muted);margin-top:8px;}
+  .cisterna-bar-wrap{margin-top:1rem;background:var(--bg3);border-radius:3px;height:6px;overflow:hidden;}
+  .cisterna-bar{height:100%;border-radius:3px;transition:width 0.4s;}
+  .cisterna-bar.diesel{background:var(--accent-diesel);}
+  .cisterna-bar.verde{background:var(--accent-verde);}
+  .cisterna-bar.alert{background:var(--accent-danger);}
+  .cisterna-footer{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);font-family:var(--font-mono);}
+  .badge-alert{position:absolute;top:12px;right:12px;background:var(--accent-danger);color:#fff;font-size:10px;font-family:var(--font-mono);padding:2px 8px;border-radius:20px;}
 
-  /* CARDS */
-  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
-  .card-title { font-family: var(--font-mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+  .pompa-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem;}
+  .pompa-label{font-family:var(--font-mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+  .pompa-num{font-family:var(--font-mono);font-size:22px;font-weight:600;margin:4px 0;}
+  .pompa-num.diesel{color:var(--accent-diesel);}
+  .pompa-num.verde{color:var(--accent-verde);}
+  .pompa-tot{font-family:var(--font-mono);font-size:11px;color:var(--muted);}
 
-  /* GRID */
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
-  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-  @media (max-width: 700px) { .grid-3, .grid-4 { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
+  .form-group{margin-bottom:1rem;}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-family:var(--font-mono);}
+  input,select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:var(--font-sans);font-size:14px;padding:8px 10px;transition:border 0.15s;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent-diesel);}
+  select option{background:var(--bg3);}
+  textarea{resize:vertical;min-height:70px;}
+  .btn{display:inline-flex;align-items:center;gap:6px;background:var(--accent-diesel);color:#000;border:none;border-radius:var(--radius);padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:opacity 0.15s;font-family:var(--font-sans);white-space:nowrap;}
+  .btn:hover{opacity:0.85;}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text);}
+  .btn-ghost:hover{background:var(--bg3);opacity:1;}
+  .btn-danger{background:var(--accent-danger);color:#fff;}
+  .btn-info{background:var(--accent-info);color:#000;}
+  .btn-sm{padding:5px 12px;font-size:12px;}
+  .input-hint{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--font-mono);}
 
-  /* CISTERNA CARD */
-  .cisterna-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; position: relative; overflow: hidden; }
-  .cisterna-card.diesel { border-top: 3px solid var(--accent-diesel); }
-  .cisterna-card.verde { border-top: 3px solid var(--accent-verde); }
-  .cisterna-card.alert { border-color: var(--accent-danger) !important; }
-  .cisterna-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
-  .cisterna-name { font-size: 16px; font-weight: 500; margin-bottom: 1rem; }
-  .cisterna-litri { font-family: var(--font-mono); font-size: 32px; font-weight: 600; line-height: 1; }
-  .cisterna-litri.diesel { color: var(--accent-diesel); }
-  .cisterna-litri.verde { color: var(--accent-verde); }
-  .cisterna-litri.alert { color: var(--accent-danger); }
-  .cisterna-unit { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .cisterna-cm { font-family: var(--font-mono); font-size: 13px; color: var(--muted); margin-top: 8px; }
-  .cisterna-bar-wrap { margin-top: 1rem; background: var(--bg3); border-radius: 3px; height: 6px; overflow: hidden; }
-  .cisterna-bar { height: 100%; border-radius: 3px; transition: width 0.4s; }
-  .cisterna-bar.diesel { background: var(--accent-diesel); }
-  .cisterna-bar.verde { background: var(--accent-verde); }
-  .cisterna-bar.alert { background: var(--accent-danger); }
-  .cisterna-footer { display: flex; justify-content: space-between; margin-top: 8px; font-size: 11px; color: var(--muted); font-family: var(--font-mono); }
-  .badge-alert { position: absolute; top: 12px; right: 12px; background: var(--accent-danger); color: #fff; font-size: 10px; font-family: var(--font-mono); padding: 2px 8px; border-radius: 20px; letter-spacing: 0.05em; }
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;padding:8px 10px;font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);border-bottom:1px solid var(--border);}
+  td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:rgba(255,255,255,0.02);}
+  .tag{display:inline-block;font-size:10px;font-family:var(--font-mono);padding:2px 8px;border-radius:20px;}
+  .tag-carico{background:rgba(74,158,222,0.12);color:var(--accent-info);}
+  .mono{font-family:var(--font-mono);}
 
-  /* POMPA CARD */
-  .pompa-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem; }
-  .pompa-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
-  .pompa-num { font-family: var(--font-mono); font-size: 22px; font-weight: 600; margin: 4px 0; }
-  .pompa-num.diesel { color: var(--accent-diesel); }
-  .pompa-num.verde { color: var(--accent-verde); }
-  .pompa-tot { font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px;}
+  .section-title{font-family:var(--font-mono);font-size:13px;color:var(--text);}
+  .section-sub{font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px;}
 
-  /* FORM */
-  .form-group { margin-bottom: 1rem; }
-  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; font-family: var(--font-mono); }
-  input, select, textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius); color: var(--text); font-family: var(--font-sans); font-size: 14px; padding: 8px 10px; transition: border 0.15s; }
-  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-diesel); }
-  select option { background: var(--bg3); }
-  textarea { resize: vertical; min-height: 80px; }
-  .btn { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-diesel); color: #000; border: none; border-radius: var(--radius); padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; font-family: var(--font-sans); }
-  .btn:hover { opacity: 0.85; }
-  .btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text); }
-  .btn-ghost:hover { border-color: var(--border2); background: var(--bg3); opacity: 1; }
-  .btn-danger { background: var(--accent-danger); color: #fff; }
-  .btn-verde { background: var(--accent-verde); color: #000; }
-  .btn-sm { padding: 5px 12px; font-size: 12px; }
-  .input-hint { font-size: 11px; color: var(--muted); margin-top: 3px; font-family: var(--font-mono); }
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;}
+  .modal-title{font-family:var(--font-mono);font-size:13px;margin-bottom:1.25rem;color:var(--accent-diesel);}
+  .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;flex-wrap:wrap;}
 
-  /* TABLE */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 8px 10px; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); border-bottom: 1px solid var(--border); }
-  td { padding: 10px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
-  .tag { display: inline-block; font-size: 10px; font-family: var(--font-mono); padding: 2px 8px; border-radius: 20px; letter-spacing: 0.05em; }
-  .tag-diesel { background: rgba(232,160,32,0.15); color: var(--accent-diesel); }
-  .tag-verde { background: rgba(61,184,122,0.15); color: var(--accent-verde); }
-  .tag-carico { background: rgba(74,158,222,0.12); color: var(--accent-info); }
-  .tag-scarico { background: rgba(224,82,82,0.12); color: var(--accent-danger); }
-  .mono { font-family: var(--font-mono); }
+  .cm-result{background:var(--bg3);border-radius:var(--radius);padding:10px 14px;font-family:var(--font-mono);font-size:24px;font-weight:600;color:var(--accent-diesel);margin-top:8px;text-align:center;}
+  #toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:10px 16px;font-size:13px;z-index:999;display:none;font-family:var(--font-mono);max-width:280px;}
+  .file-drop{border:1px dashed var(--border2);border-radius:var(--radius);padding:1rem;text-align:center;cursor:pointer;transition:border 0.15s;}
+  .file-drop:hover{border-color:var(--accent-diesel);}
+  .file-list{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;}
+  .file-chip{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:4px 10px;font-size:11px;font-family:var(--font-mono);color:var(--muted);display:flex;align-items:center;gap:6px;}
+  .file-chip button{background:none;border:none;color:var(--accent-danger);cursor:pointer;font-size:14px;line-height:1;padding:0;}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:var(--bg2);}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+  .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
+  .filter-bar input,.filter-bar select{width:auto;flex:1;min-width:120px;}
+  .divider{border:none;border-top:1px solid var(--border);margin:1rem 0;}
+  .giacenza-info{background:var(--bg3);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--muted);font-family:var(--font-mono);}
+  .giacenza-info .vd{color:var(--accent-verde);}
+  .giacenza-info .ds{color:var(--accent-diesel);}
 
-  /* SECTION HEADER */
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
-  .section-title { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
-  .section-sub { font-family: var(--font-mono); font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-  /* MODAL */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: 1.5rem; width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; }
-  .modal-title { font-family: var(--font-mono); font-size: 13px; margin-bottom: 1.25rem; color: var(--accent-diesel); }
-  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; }
-
-  /* CALCOLATORE CM */
-  .cm-result { background: var(--bg3); border-radius: var(--radius); padding: 10px 14px; font-family: var(--font-mono); font-size: 20px; font-weight: 600; color: var(--accent-diesel); margin-top: 8px; text-align: center; }
-
-  /* TOAST */
-  #toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius); padding: 10px 16px; font-size: 13px; z-index: 999; display: none; font-family: var(--font-mono); }
-
-  /* FILE UPLOAD */
-  .file-drop { border: 1px dashed var(--border2); border-radius: var(--radius); padding: 1rem; text-align: center; cursor: pointer; transition: border 0.15s; }
-  .file-drop:hover { border-color: var(--accent-diesel); }
-  .file-drop input[type=file] { display: none; }
-  .file-list { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
-  .file-chip { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 10px; font-size: 11px; font-family: var(--font-mono); color: var(--muted); display: flex; align-items: center; gap: 6px; }
-  .file-chip button { background: none; border: none; color: var(--accent-danger); cursor: pointer; font-size: 14px; line-height: 1; padding: 0; }
-
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg2); }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-  /* CONTATORI FILTER */
-  .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem; }
-  .filter-bar input, .filter-bar select { width: auto; flex: 1; min-width: 120px; }
-
-  .divider { border: none; border-top: 1px solid var(--border); margin: 1rem 0; }
-
-  .info-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .info-row:last-child { border-bottom: none; }
-  .info-row .label { color: var(--muted); font-family: var(--font-mono); font-size: 11px; }
-  .info-row .value { font-family: var(--font-mono); }
+  /* LOGIN SCREEN */
+  #login-screen{position:fixed;inset:0;background:var(--bg);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;}
+  #login-screen.hidden{display:none;}
+  .login-logo{font-family:var(--font-mono);font-size:32px;color:var(--accent-diesel);letter-spacing:0.1em;}
+  .login-sub{font-family:var(--font-mono);font-size:12px;color:var(--muted);text-align:center;}
+  .login-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:340px;text-align:center;}
+  .login-title{font-family:var(--font-mono);font-size:13px;margin-bottom:0.5rem;}
+  .login-desc{font-size:12px;color:var(--muted);margin-bottom:1.5rem;line-height:1.6;}
+  .btn-google{background:#fff;color:#333;border:1px solid #ddd;display:inline-flex;align-items:center;gap:10px;padding:10px 20px;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;transition:box-shadow 0.15s;font-family:var(--font-sans);}
+  .btn-google:hover{box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+  .btn-google svg{width:18px;height:18px;flex-shrink:0;}
 </style>
 </head>
 <body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-logo">⛽ DISTRIBUTORE</div>
+  <div class="login-sub">Gestione Carburanti · ALA Carburanti S.R.L.</div>
+  <div class="login-card">
+    <div class="login-title">Accedi con Google</div>
+    <div class="login-desc">I dati vengono salvati e sincronizzati sul tuo Google Drive personale.</div>
+    <button class="btn-google" onclick="handleLogin()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Accedi con Google
+    </button>
+  </div>
+</div>
 
 <nav>
   <div class="nav-brand">⛽ DISTRIBUTORE</div>
@@ -162,21 +156,21 @@
     <div class="nav-tab" onclick="showPage('contatori')">Contatori</div>
     <div class="nav-tab" onclick="showPage('storico')">Storico</div>
     <div class="nav-tab" onclick="showPage('calcolatore')">Calcolatore</div>
+    <div class="nav-tab" onclick="showPage('impostazioni')">⚙</div>
   </div>
   <div class="nav-spacer"></div>
-  <div class="nav-date" id="nav-clock"></div>
+  <div class="nav-right">
+    <div class="drive-status"><div class="drive-dot" id="drive-dot"></div><span id="drive-label" style="color:var(--muted)">Drive</span></div>
+    <div class="nav-date" id="nav-clock"></div>
+  </div>
 </nav>
 
 <!-- DASHBOARD -->
 <div class="page active" id="page-dashboard">
-  <div class="section-header" style="margin-bottom:1.5rem">
-    <div>
-      <div class="section-title">Stato Impianto</div>
-      <div class="section-sub" id="last-update-label">—</div>
-    </div>
+  <div class="section-header">
+    <div><div class="section-title">Stato Impianto</div><div class="section-sub" id="last-update-label">—</div></div>
     <button class="btn btn-ghost btn-sm" onclick="openMisura()">📏 Inserisci Misura</button>
   </div>
-
   <div class="grid-3" style="margin-bottom:1.5rem">
     <div class="cisterna-card diesel" id="card-c1">
       <div class="cisterna-label">Cisterna 1 · Pompa 3</div>
@@ -185,10 +179,7 @@
       <div class="cisterna-unit">litri</div>
       <div class="cisterna-cm" id="c1-cm">— cm</div>
       <div class="cisterna-bar-wrap"><div class="cisterna-bar diesel" id="c1-bar" style="width:0%"></div></div>
-      <div class="cisterna-footer">
-        <span id="c1-pct">—</span>
-        <span>max 6.440 lt</span>
-      </div>
+      <div class="cisterna-footer"><span id="c1-pct">—</span><span>max 6.440 lt</span></div>
     </div>
     <div class="cisterna-card verde" id="card-c2">
       <div class="cisterna-label">Cisterna 2 · Pompe 1/2</div>
@@ -197,10 +188,7 @@
       <div class="cisterna-unit">litri</div>
       <div class="cisterna-cm" id="c2-cm">— cm</div>
       <div class="cisterna-bar-wrap"><div class="cisterna-bar verde" id="c2-bar" style="width:0%"></div></div>
-      <div class="cisterna-footer">
-        <span id="c2-pct">—</span>
-        <span>max 12.751 lt</span>
-      </div>
+      <div class="cisterna-footer"><span id="c2-pct">—</span><span>max 12.751 lt</span></div>
     </div>
     <div class="cisterna-card diesel" id="card-c3">
       <div class="cisterna-label">Cisterna 3 · Pompa 4</div>
@@ -209,97 +197,46 @@
       <div class="cisterna-unit">litri</div>
       <div class="cisterna-cm" id="c3-cm">— cm</div>
       <div class="cisterna-bar-wrap"><div class="cisterna-bar diesel" id="c3-bar" style="width:0%"></div></div>
-      <div class="cisterna-footer">
-        <span id="c3-pct">—</span>
-        <span>max 12.751 lt</span>
-      </div>
+      <div class="cisterna-footer"><span id="c3-pct">—</span><span>max 12.751 lt</span></div>
     </div>
   </div>
-
   <div class="section-header">
     <div class="section-title">Contatori Pompe</div>
-    <div class="section-sub">Letture attuali</div>
+    <div class="section-sub">Ultime letture registrate</div>
   </div>
   <div class="grid-4" style="margin-bottom:1.5rem">
-    <div class="pompa-card">
-      <div class="pompa-label">Pompa 1 · Verde</div>
-      <div class="pompa-num verde" id="p1-tot">—</div>
-      <div class="pompa-tot">totalizzatore</div>
-    </div>
-    <div class="pompa-card">
-      <div class="pompa-label">Pompa 2 · Verde</div>
-      <div class="pompa-num verde" id="p2-tot">—</div>
-      <div class="pompa-tot">totalizzatore</div>
-    </div>
-    <div class="pompa-card">
-      <div class="pompa-label">Pompa 3 · Gasolio</div>
-      <div class="pompa-num diesel" id="p3-tot">—</div>
-      <div class="pompa-tot">totalizzatore</div>
-    </div>
-    <div class="pompa-card">
-      <div class="pompa-label">Pompa 4 · Gasolio</div>
-      <div class="pompa-num diesel" id="p4-tot">—</div>
-      <div class="pompa-tot">totalizzatore</div>
-    </div>
+    <div class="pompa-card"><div class="pompa-label">Pompa 1 · Verde</div><div class="pompa-num verde" id="p1-tot">—</div><div class="pompa-tot">totalizzatore</div></div>
+    <div class="pompa-card"><div class="pompa-label">Pompa 2 · Verde</div><div class="pompa-num verde" id="p2-tot">—</div><div class="pompa-tot">totalizzatore</div></div>
+    <div class="pompa-card"><div class="pompa-label">Pompa 3 · Gasolio</div><div class="pompa-num diesel" id="p3-tot">—</div><div class="pompa-tot">totalizzatore</div></div>
+    <div class="pompa-card"><div class="pompa-label">Pompa 4 · Gasolio</div><div class="pompa-num diesel" id="p4-tot">—</div><div class="pompa-tot">totalizzatore</div></div>
   </div>
-
   <div class="card">
     <div class="card-title">Ultimi Movimenti</div>
-    <table id="dashboard-table">
-      <thead><tr><th>Data/Ora</th><th>Tipo</th><th>Cisterna</th><th>Quantità</th><th>Note</th></tr></thead>
-      <tbody id="dashboard-tbody"></tbody>
-    </table>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Data/Ora</th><th>Tipo</th><th>Riferimento</th><th>C1 Gas.P</th><th>C2 Verde</th><th>C3 Gas.G</th></tr></thead>
+        <tbody id="dashboard-tbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <!-- NUOVO CARICO -->
 <div class="page" id="page-carico">
-  <div class="section-header">
-    <div class="section-title">Registra Carico</div>
-  </div>
-
+  <div class="section-header"><div class="section-title">Registra Nuovo Carico</div></div>
   <div class="grid-2">
     <div>
       <div class="card">
         <div class="card-title">Dati DAS / Bolla</div>
-        <div class="form-group">
-          <label>Numero Scarico (progressivo anno)</label>
-          <input type="number" id="c-num-scarico" placeholder="es. 5" min="1">
-        </div>
-        <div class="form-group">
-          <label>Numero DAS</label>
-          <input type="text" id="c-das" placeholder="es. 26IT5452726ANO00001O9">
-        </div>
-        <div class="form-group">
-          <label>Data</label>
-          <input type="date" id="c-data">
-        </div>
-        <div class="form-group">
-          <label>Ora</label>
-          <input type="time" id="c-ora">
-        </div>
-        <div class="form-group">
-          <label>Fornitore</label>
-          <input type="text" id="c-fornitore" placeholder="es. Italiana Petroli / API Ancona">
-        </div>
-        <div class="form-group">
-          <label>Trasportatore</label>
-          <input type="text" id="c-trasportatore" placeholder="es. Transadriatico">
-        </div>
-        <div class="form-group">
-          <label>Autista</label>
-          <input type="text" id="c-autista" placeholder="es. Tessuto Raffaele Fabio">
-        </div>
-        <div class="form-group">
-          <label>Targa Mezzo</label>
-          <input type="text" id="c-targa" placeholder="es. EZ050FR / XA624NT">
-        </div>
-        <div class="form-group">
-          <label>Note</label>
-          <textarea id="c-note" placeholder="Note aggiuntive..."></textarea>
-        </div>
+        <div class="form-group"><label>Numero Scarico (progressivo anno)</label><input type="number" id="c-num-scarico" placeholder="es. 6" min="1"></div>
+        <div class="form-group"><label>Numero DAS</label><input type="text" id="c-das" placeholder="es. 26IT5452726ANO00001O9"></div>
+        <div class="grid-2" style="gap:8px"><div class="form-group"><label>Data</label><input type="date" id="c-data"></div><div class="form-group"><label>Ora</label><input type="time" id="c-ora"></div></div>
+        <div class="form-group"><label>Fornitore</label><input type="text" id="c-fornitore" placeholder="es. Italiana Petroli / API Ancona"></div>
+        <div class="form-group"><label>Trasportatore</label><input type="text" id="c-trasportatore" placeholder="es. Transadriatico"></div>
+        <div class="form-group"><label>Autista</label><input type="text" id="c-autista" placeholder="es. Tessuto Raffaele Fabio"></div>
+        <div class="form-group"><label>Targa Mezzo</label><input type="text" id="c-targa" placeholder="es. EZ050FR / XA624NT"></div>
+        <div class="form-group"><label>Note</label><textarea id="c-note" placeholder="Note aggiuntive..."></textarea></div>
       </div>
-
       <div class="card">
         <div class="card-title">Foto DAS / Documenti</div>
         <div class="file-drop" onclick="document.getElementById('das-file-input').click()">
@@ -310,90 +247,35 @@
         <div class="file-list" id="file-list"></div>
       </div>
     </div>
-
     <div>
       <div class="card">
         <div class="card-title">Cisterna 1 – Gasolio Piccola (Pompa 3)</div>
-        <div style="background:var(--bg3);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--muted);font-family:var(--font-mono)">
-          Giacenza attuale: <span id="c-c1-current" style="color:var(--accent-diesel)">—</span>
-        </div>
-        <div class="form-group">
-          <label>CM prima del carico</label>
-          <input type="number" id="c-c1-cm-pre" placeholder="cm" min="0" max="126" oninput="updateLitriCarico(1,'pre')">
-          <div class="input-hint" id="c-c1-lt-pre">→ — litri</div>
-        </div>
-        <div class="form-group">
-          <label>Litri caricati (da DAS)</label>
-          <input type="number" id="c-c1-litri" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label>CM dopo il carico</label>
-          <input type="number" id="c-c1-cm-post" placeholder="cm" min="0" max="126" oninput="updateLitriCarico(1,'post')">
-          <div class="input-hint" id="c-c1-lt-post">→ — litri</div>
-        </div>
-        <div class="form-group">
-          <label>Contatore Pompa 3 al momento del carico</label>
-          <input type="number" id="c-p3-counter" placeholder="lettura contatore">
-        </div>
+        <div class="giacenza-info">Giacenza attuale: <span class="ds" id="c-c1-current">—</span></div>
+        <div class="form-group"><label>CM prima del carico</label><input type="number" id="c-c1-cm-pre" placeholder="cm" min="0" max="126" oninput="updateLitriCarico(1,'pre')"><div class="input-hint" id="c-c1-lt-pre">→ — litri</div></div>
+        <div class="form-group"><label>Litri caricati (da DAS)</label><input type="number" id="c-c1-litri" placeholder="0" min="0"></div>
+        <div class="form-group"><label>CM dopo il carico</label><input type="number" id="c-c1-cm-post" placeholder="cm" min="0" max="126" oninput="updateLitriCarico(1,'post')"><div class="input-hint" id="c-c1-lt-post">→ — litri</div></div>
+        <div class="form-group"><label>Contatore Pompa 3 al carico</label><input type="number" id="c-p3-counter" placeholder="lettura contatore"></div>
       </div>
-
       <div class="card">
         <div class="card-title">Cisterna 2 – Verde (Pompe 1/2)</div>
-        <div style="background:var(--bg3);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--muted);font-family:var(--font-mono)">
-          Giacenza attuale: <span id="c-c2-current" style="color:var(--accent-verde)">—</span>
-        </div>
-        <div class="form-group">
-          <label>CM prima del carico</label>
-          <input type="number" id="c-c2-cm-pre" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(2,'pre')">
-          <div class="input-hint" id="c-c2-lt-pre">→ — litri</div>
-        </div>
-        <div class="form-group">
-          <label>Litri caricati (da DAS)</label>
-          <input type="number" id="c-c2-litri" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label>CM dopo il carico</label>
-          <input type="number" id="c-c2-cm-post" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(2,'post')">
-          <div class="input-hint" id="c-c2-lt-post">→ — litri</div>
-        </div>
-        <div class="form-group">
-          <label>Contatori Pompa 1 + Pompa 2 al carico</label>
-          <div class="grid-2" style="gap:8px">
-            <input type="number" id="c-p1-counter" placeholder="Pompa 1">
-            <input type="number" id="c-p2-counter" placeholder="Pompa 2">
-          </div>
-        </div>
+        <div class="giacenza-info">Giacenza attuale: <span class="vd" id="c-c2-current">—</span></div>
+        <div class="form-group"><label>CM prima del carico</label><input type="number" id="c-c2-cm-pre" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(2,'pre')"><div class="input-hint" id="c-c2-lt-pre">→ — litri</div></div>
+        <div class="form-group"><label>Litri caricati (da DAS)</label><input type="number" id="c-c2-litri" placeholder="0" min="0"></div>
+        <div class="form-group"><label>CM dopo il carico</label><input type="number" id="c-c2-cm-post" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(2,'post')"><div class="input-hint" id="c-c2-lt-post">→ — litri</div></div>
+        <div class="form-group"><label>Contatori Pompa 1 + Pompa 2 al carico</label><div class="grid-2" style="gap:8px"><input type="number" id="c-p1-counter" placeholder="Pompa 1"><input type="number" id="c-p2-counter" placeholder="Pompa 2"></div></div>
       </div>
-
       <div class="card">
         <div class="card-title">Cisterna 3 – Gasolio Grande (Pompa 4)</div>
-        <div style="background:var(--bg3);border-radius:var(--radius);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--muted);font-family:var(--font-mono)">
-          Giacenza attuale: <span id="c-c3-current" style="color:var(--accent-diesel)">—</span>
-        </div>
-        <div class="form-group">
-          <label>CM prima del carico</label>
-          <input type="number" id="c-c3-cm-pre" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(3,'pre')">
-          <div class="input-hint" id="c-c3-lt-pre">→ — litri</div>
-        </div>
-        <div class="form-group">
-          <label>Litri caricati (da DAS)</label>
-          <input type="number" id="c-c3-litri" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label>CM dopo il carico</label>
-          <input type="number" id="c-c3-cm-post" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(3,'post')">
-          <div class="input-hint" id="c-c3-lt-post">→ — litri</div>
-        </div>
-        <div class="form-group">
-          <label>Contatore Pompa 4 al momento del carico</label>
-          <input type="number" id="c-p4-counter" placeholder="lettura contatore">
-        </div>
+        <div class="giacenza-info">Giacenza attuale: <span class="ds" id="c-c3-current">—</span></div>
+        <div class="form-group"><label>CM prima del carico</label><input type="number" id="c-c3-cm-pre" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(3,'pre')"><div class="input-hint" id="c-c3-lt-pre">→ — litri</div></div>
+        <div class="form-group"><label>Litri caricati (da DAS)</label><input type="number" id="c-c3-litri" placeholder="0" min="0"></div>
+        <div class="form-group"><label>CM dopo il carico</label><input type="number" id="c-c3-cm-post" placeholder="cm" min="0" max="159" oninput="updateLitriCarico(3,'post')"><div class="input-hint" id="c-c3-lt-post">→ — litri</div></div>
+        <div class="form-group"><label>Contatore Pompa 4 al carico</label><input type="number" id="c-p4-counter" placeholder="lettura contatore"></div>
       </div>
-
-      <div style="display:flex;gap:8px;justify-content:flex-end">
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
         <button class="btn btn-ghost" onclick="clearCaricoForm()">Annulla</button>
         <button class="btn" onclick="salvaCarico()">💾 Salva Carico</button>
-        <button class="btn btn-ghost" onclick="esportaUltimoCarico()">📄 Esporta Report</button>
+        <button class="btn btn-ghost" onclick="esportaUltimoCarico()">📄 Report Ultimo</button>
       </div>
     </div>
   </div>
@@ -401,116 +283,92 @@
 
 <!-- CONTATORI -->
 <div class="page" id="page-contatori">
-  <div class="section-header">
-    <div class="section-title">Letture Contatori</div>
-  </div>
-
-  <div class="card" style="margin-bottom:1rem">
-    <div class="card-title">Inserisci Lettura Contatori</div>
-    <div class="grid-2">
-      <div class="form-group">
-        <label>Data</label>
-        <input type="date" id="ct-data">
-      </div>
-      <div class="form-group">
-        <label>Ora</label>
-        <input type="time" id="ct-ora">
-      </div>
-    </div>
+  <div class="section-header"><div class="section-title">Letture Contatori</div></div>
+  <div class="card">
+    <div class="card-title">Inserisci Lettura</div>
+    <div class="grid-2"><div class="form-group"><label>Data</label><input type="date" id="ct-data"></div><div class="form-group"><label>Ora</label><input type="time" id="ct-ora"></div></div>
     <div class="grid-4">
-      <div class="form-group">
-        <label>Pompa 1 (Verde)</label>
-        <input type="number" id="ct-p1" placeholder="0000000">
-      </div>
-      <div class="form-group">
-        <label>Pompa 2 (Verde)</label>
-        <input type="number" id="ct-p2" placeholder="0000000">
-      </div>
-      <div class="form-group">
-        <label>Pompa 3 (Gasolio)</label>
-        <input type="number" id="ct-p3" placeholder="0000000">
-      </div>
-      <div class="form-group">
-        <label>Pompa 4 (Gasolio)</label>
-        <input type="number" id="ct-p4" placeholder="0000000">
-      </div>
+      <div class="form-group"><label>Pompa 1 (Verde)</label><input type="number" id="ct-p1" placeholder="0000000"></div>
+      <div class="form-group"><label>Pompa 2 (Verde)</label><input type="number" id="ct-p2" placeholder="0000000"></div>
+      <div class="form-group"><label>Pompa 3 (Gasolio)</label><input type="number" id="ct-p3" placeholder="0000000"></div>
+      <div class="form-group"><label>Pompa 4 (Gasolio)</label><input type="number" id="ct-p4" placeholder="0000000"></div>
     </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button class="btn" onclick="salvaContatori()">💾 Salva Lettura</button>
-    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" onclick="salvaContatori()">💾 Salva Lettura</button></div>
   </div>
-
   <div class="card">
     <div class="card-title">Storico Contatori</div>
     <div class="filter-bar">
-      <input type="date" id="ct-filter-da" placeholder="Da">
-      <input type="date" id="ct-filter-a" placeholder="A">
-      <select id="ct-filter-pompa">
-        <option value="">Tutte le pompe</option>
-        <option value="1">Pompa 1</option>
-        <option value="2">Pompa 2</option>
-        <option value="3">Pompa 3</option>
-        <option value="4">Pompa 4</option>
-      </select>
+      <input type="date" id="ct-filter-da">
+      <input type="date" id="ct-filter-a">
       <button class="btn btn-ghost btn-sm" onclick="renderContatori()">Filtra</button>
       <button class="btn btn-ghost btn-sm" onclick="filterFromLastCarico()">Da ultimo carico</button>
     </div>
-    <table>
-      <thead><tr><th>Data/Ora</th><th>P1 Verde</th><th>P2 Verde</th><th>P3 Gasolio</th><th>P4 Gasolio</th><th>Δ Erogato</th></tr></thead>
-      <tbody id="contatori-tbody"></tbody>
-    </table>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>Data/Ora</th><th>P1 Verde</th><th>P2 Verde</th><th>P3 Gasolio</th><th>P4 Gasolio</th><th>Δ Erogato</th></tr></thead>
+        <tbody id="contatori-tbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <!-- STORICO -->
 <div class="page" id="page-storico">
-  <div class="section-header">
-    <div class="section-title">Storico Movimenti</div>
-  </div>
+  <div class="section-header"><div class="section-title">Storico Carichi</div></div>
   <div class="card">
-    <table>
-      <thead><tr><th>#</th><th>Data/Ora</th><th>Tipo</th><th>DAS/Ref</th><th>C1 Gas.P</th><th>C2 Verde</th><th>C3 Gas.G</th><th>Azioni</th></tr></thead>
-      <tbody id="storico-tbody"></tbody>
-    </table>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>#</th><th>Data/Ora</th><th>DAS</th><th>C1 Gas.P</th><th>C2 Verde</th><th>C3 Gas.G</th><th>Autista</th><th></th></tr></thead>
+        <tbody id="storico-tbody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <!-- CALCOLATORE -->
 <div class="page" id="page-calcolatore">
-  <div class="section-header">
-    <div class="section-title">Calcolatore CM → Litri</div>
-  </div>
+  <div class="section-header"><div class="section-title">Calcolatore CM → Litri</div></div>
   <div class="grid-2">
     <div class="card">
       <div class="card-title">Conversione</div>
-      <div class="form-group">
-        <label>Cisterna</label>
-        <select id="calc-cisterna">
-          <option value="1">Cisterna 1 – Gasolio Piccola (max 126 cm)</option>
-          <option value="2">Cisterna 2 – Verde (max 159 cm)</option>
-          <option value="3">Cisterna 3 – Gasolio Grande (max 159 cm)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Altezza (cm)</label>
-        <input type="number" id="calc-cm" placeholder="es. 75" min="1" oninput="calcolaConversione()">
-      </div>
+      <div class="form-group"><label>Cisterna</label><select id="calc-cisterna"><option value="1">Cisterna 1 – Gasolio Piccola (max 126 cm)</option><option value="2">Cisterna 2 – Verde (max 159 cm)</option><option value="3">Cisterna 3 – Gasolio Grande (max 159 cm)</option></select></div>
+      <div class="form-group"><label>Altezza (cm)</label><input type="number" id="calc-cm" placeholder="es. 75" min="1" oninput="calcolaConversione()"></div>
       <div class="cm-result" id="calc-result">— litri</div>
     </div>
     <div class="card">
       <div class="card-title">Info Cisterne</div>
-      <div style="font-size:13px;color:var(--muted);line-height:2">
+      <div style="line-height:2;font-size:13px">
         <div><span style="color:var(--accent-diesel)">■</span> Cisterna 1 – Gasolio Piccola</div>
-        <div style="margin-left:1rem;font-family:var(--font-mono);font-size:11px">Cap. 6.200 lt · Ø 1.270 m · L 5.000 m · tabella 1–126 cm</div>
+        <div style="margin-left:1rem;font-family:var(--font-mono);font-size:11px;color:var(--muted)">Cap. 6.200 lt · Ø 1.270 m · L 5.000 m · 1–126 cm</div>
         <div style="margin-top:8px"><span style="color:var(--accent-verde)">■</span> Cisterna 2 – Verde</div>
-        <div style="margin-left:1rem;font-family:var(--font-mono);font-size:11px">Cap. 12.600 lt · Ø 1.600 m · L 6.200 m · tabella 1–159 cm</div>
+        <div style="margin-left:1rem;font-family:var(--font-mono);font-size:11px;color:var(--muted)">Cap. 12.600 lt · Ø 1.600 m · L 6.200 m · 1–159 cm</div>
         <div style="margin-top:8px"><span style="color:var(--accent-diesel)">■</span> Cisterna 3 – Gasolio Grande</div>
-        <div style="margin-left:1rem;font-family:var(--font-mono);font-size:11px">Cap. 12.600 lt · Ø 1.600 m · L 6.200 m · tabella 1–159 cm</div>
-        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border)">
-          <span style="color:var(--accent-danger)">⚠</span> Soglia allarme: <span style="font-family:var(--font-mono)">1.800 litri</span>
-        </div>
+        <div style="margin-left:1rem;font-family:var(--font-mono);font-size:11px;color:var(--muted)">Cap. 12.600 lt · Ø 1.600 m · L 6.200 m · 1–159 cm</div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-family:var(--font-mono);font-size:12px"><span style="color:var(--accent-danger)">⚠</span> Soglia allarme: <span id="soglia-display">1.800</span> litri</div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- IMPOSTAZIONI -->
+<div class="page" id="page-impostazioni">
+  <div class="section-header"><div class="section-title">Impostazioni</div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Account Google Drive</div>
+      <div id="account-info" style="font-size:13px;color:var(--muted);margin-bottom:1rem;font-family:var(--font-mono)">—</div>
+      <button class="btn btn-danger btn-sm" onclick="handleLogout()">Disconnetti</button>
+    </div>
+    <div class="card">
+      <div class="card-title">Soglia Allarme Cisterne</div>
+      <div class="form-group"><label>Litri minimi prima dell'allarme</label><input type="number" id="soglia-input" value="1800" min="0"></div>
+      <button class="btn btn-ghost btn-sm" onclick="salvaSoglia()">Salva Soglia</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Backup Locale</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1rem;line-height:1.6">Esporta una copia locale dei dati come file JSON.</p>
+    <button class="btn btn-ghost btn-sm" onclick="esportaBackupLocale()">⬇️ Esporta JSON</button>
   </div>
 </div>
 
@@ -518,28 +376,11 @@
 <div class="modal-overlay" id="modal-misura">
   <div class="modal">
     <div class="modal-title">📏 Inserisci Misura Cisterne</div>
-    <div class="form-group">
-      <label>Data</label><input type="date" id="m-data">
-    </div>
-    <div class="form-group">
-      <label>Ora</label><input type="time" id="m-ora">
-    </div>
+    <div class="grid-2"><div class="form-group"><label>Data</label><input type="date" id="m-data"></div><div class="form-group"><label>Ora</label><input type="time" id="m-ora"></div></div>
     <hr class="divider">
-    <div class="form-group">
-      <label>Cisterna 1 – Gasolio Piccola (cm)</label>
-      <input type="number" id="m-c1" placeholder="cm" min="0" max="126" oninput="updateMisuraHint(1)">
-      <div class="input-hint" id="m-c1-hint">→ — litri</div>
-    </div>
-    <div class="form-group">
-      <label>Cisterna 2 – Verde (cm)</label>
-      <input type="number" id="m-c2" placeholder="cm" min="0" max="159" oninput="updateMisuraHint(2)">
-      <div class="input-hint" id="m-c2-hint">→ — litri</div>
-    </div>
-    <div class="form-group">
-      <label>Cisterna 3 – Gasolio Grande (cm)</label>
-      <input type="number" id="m-c3" placeholder="cm" min="0" max="159" oninput="updateMisuraHint(3)">
-      <div class="input-hint" id="m-c3-hint">→ — litri</div>
-    </div>
+    <div class="form-group"><label>Cisterna 1 – Gasolio Piccola (cm)</label><input type="number" id="m-c1" placeholder="cm" min="0" max="126" oninput="updateMisuraHint(1)"><div class="input-hint" id="m-c1-hint">→ — litri</div></div>
+    <div class="form-group"><label>Cisterna 2 – Verde (cm)</label><input type="number" id="m-c2" placeholder="cm" min="0" max="159" oninput="updateMisuraHint(2)"><div class="input-hint" id="m-c2-hint">→ — litri</div></div>
+    <div class="form-group"><label>Cisterna 3 – Gasolio Grande (cm)</label><input type="number" id="m-c3" placeholder="cm" min="0" max="159" oninput="updateMisuraHint(3)"><div class="input-hint" id="m-c3-hint">→ — litri</div></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-misura')">Annulla</button>
       <button class="btn" onclick="salvaMisura()">Salva Misura</button>
@@ -551,11 +392,11 @@
 <div class="modal-overlay" id="modal-report">
   <div class="modal" style="max-width:640px">
     <div class="modal-title">📄 Report Carico – Scarico #<span id="report-num">—</span></div>
-    <div id="report-content" style="font-family:var(--font-mono);font-size:12px;line-height:1.8;white-space:pre-wrap;background:var(--bg3);border-radius:var(--radius);padding:1rem;color:var(--text);max-height:60vh;overflow-y:auto"></div>
+    <div id="report-content" style="font-family:var(--font-mono);font-size:12px;line-height:1.8;white-space:pre-wrap;background:var(--bg3);border-radius:var(--radius);padding:1rem;color:var(--text);max-height:55vh;overflow-y:auto"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('modal-report')">Chiudi</button>
-      <button class="btn" onclick="copyReport()">📋 Copia Testo</button>
-      <button class="btn btn-verde" onclick="downloadReport()">⬇️ Scarica TXT</button>
+      <button class="btn btn-ghost" onclick="copyReport()">📋 Copia</button>
+      <button class="btn" onclick="downloadReport()">⬇️ Scarica TXT</button>
     </div>
   </div>
 </div>
@@ -564,379 +405,354 @@
 
 <script>
 // ============================================================
-// TABELLE DI TARATURA
+// CONFIG
 // ============================================================
-const TAB1 = {1:10,2:27,3:46,4:69,5:94,6:121,7:151,8:183,9:215,10:250,11:287,12:325,13:364,14:404,15:446,16:488,17:533,18:578,19:624,20:672,21:719,22:768,23:818,24:869,25:920,26:972,27:1025,28:1079,29:1133,30:1188,31:1244,32:1299,33:1357,34:1413,35:1472,36:1530,37:1589,38:1647,39:1707,40:1768,41:1828,42:1889,43:1950,44:2011,45:2073,46:2135,47:2198,48:2261,49:2324,50:2386,51:2450,52:2513,53:2577,54:2641,55:2705,56:2769,57:2834,58:2898,59:2963,60:3027,61:3092,62:3157,63:3221,64:3286,65:3350,66:3415,67:3480,68:3544,69:3609,70:3673,71:3737,72:3801,73:3865,74:3929,75:3993,76:4056,77:4119,78:4183,79:4244,80:4307,81:4369,82:4431,83:4493,84:4554,85:4615,86:4675,87:4735,88:4795,89:4855,90:4913,91:4972,92:5029,93:5087,94:5143,95:5199,96:5255,97:5310,98:5364,99:5417,100:5470,101:5522,102:5575,103:5624,104:5674,105:5723,106:5772,107:5818,108:5865,109:5909,110:5954,111:5997,112:6038,113:6079,114:6119,115:6156,116:6192,117:6227,118:6261,119:6292,120:6321,121:6348,122:6373,123:6396,124:6416,125:6432,126:6440};
-const TAB23 = {1:15,2:37,3:65,4:96,5:132,6:171,7:213,8:257,9:303,10:352,11:403,12:457,13:513,14:570,15:629,16:690,17:753,18:817,19:883,20:954,21:1018,22:1088,23:1159,24:1232,25:1306,26:1381,27:1457,28:1534,29:1612,30:1692,31:1771,32:1853,33:1935,34:2018,35:2102,36:2186,37:2272,38:2359,39:2446,40:2534,41:2623,42:2712,43:2801,44:2892,45:2984,46:3076,47:3169,48:3261,49:3355,50:3449,51:3544,52:3639,53:3735,54:3831,55:3927,56:4029,57:4121,58:4218,59:4316,60:4415,61:4513,62:4612,63:4712,64:4811,65:4911,66:5011,67:5111,68:5212,69:5312,70:5413,71:5514,72:5615,73:5716,74:5817,75:5919,76:6020,77:6121,78:6223,79:6324,80:6426,81:6528,82:6628,83:6730,84:6891,85:6932,86:7034,87:7135,88:7236,89:7337,90:7437,91:7538,92:7638,93:7739,94:7839,95:7938,96:8038,97:8137,98:8236,99:8335,100:8433,101:8531,102:8629,103:8726,104:8823,105:8919,106:9015,107:9111,108:9206,109:9301,110:9395,111:9489,112:9581,113:9674,114:9766,115:9857,116:9948,117:10037,118:10127,119:10216,120:10304,121:10390,122:10477,123:10563,124:10647,125:10732,126:10815,127:10897,128:10978,129:11058,130:11138,131:11215,132:11293,133:11368,134:11444,135:11517,136:11590,137:11661,138:11732,139:11800,140:11867,141:11932,142:11997,143:12059,144:12120,145:12179,146:12236,147:12299,148:12346,149:12398,150:12447,151:12493,152:12537,153:12579,154:12617,155:12653,156:12684,157:12712,158:12734,159:12751};
+const CLIENT_ID = '352288408553-oi4ptscd5pt1p0ikvfhpmpdihb1fuiov.apps.googleusercontent.com';
+const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+const FILE_NAME = 'distributore_data.json';
 
-const MAX_LT = {1:6440, 2:12751, 3:12751};
-const SOGLIA = 1800;
+// ============================================================
+// TABELLE TARATURA
+// ============================================================
+const TAB1={1:10,2:27,3:46,4:69,5:94,6:121,7:151,8:183,9:215,10:250,11:287,12:325,13:364,14:404,15:446,16:488,17:533,18:578,19:624,20:672,21:719,22:768,23:818,24:869,25:920,26:972,27:1025,28:1079,29:1133,30:1188,31:1244,32:1299,33:1357,34:1413,35:1472,36:1530,37:1589,38:1647,39:1707,40:1768,41:1828,42:1889,43:1950,44:2011,45:2073,46:2135,47:2198,48:2261,49:2324,50:2386,51:2450,52:2513,53:2577,54:2641,55:2705,56:2769,57:2834,58:2898,59:2963,60:3027,61:3092,62:3157,63:3221,64:3286,65:3350,66:3415,67:3480,68:3544,69:3609,70:3673,71:3737,72:3801,73:3865,74:3929,75:3993,76:4056,77:4119,78:4183,79:4244,80:4307,81:4369,82:4431,83:4493,84:4554,85:4615,86:4675,87:4735,88:4795,89:4855,90:4913,91:4972,92:5029,93:5087,94:5143,95:5199,96:5255,97:5310,98:5364,99:5417,100:5470,101:5522,102:5575,103:5624,104:5674,105:5723,106:5772,107:5818,108:5865,109:5909,110:5954,111:5997,112:6038,113:6079,114:6119,115:6156,116:6192,117:6227,118:6261,119:6292,120:6321,121:6348,122:6373,123:6396,124:6416,125:6432,126:6440};
+const TAB23={1:15,2:37,3:65,4:96,5:132,6:171,7:213,8:257,9:303,10:352,11:403,12:457,13:513,14:570,15:629,16:690,17:753,18:817,19:883,20:954,21:1018,22:1088,23:1159,24:1232,25:1306,26:1381,27:1457,28:1534,29:1612,30:1692,31:1771,32:1853,33:1935,34:2018,35:2102,36:2186,37:2272,38:2359,39:2446,40:2534,41:2623,42:2712,43:2801,44:2892,45:2984,46:3076,47:3169,48:3261,49:3355,50:3449,51:3544,52:3639,53:3735,54:3831,55:3927,56:4029,57:4121,58:4218,59:4316,60:4415,61:4513,62:4612,63:4712,64:4811,65:4911,66:5011,67:5111,68:5212,69:5312,70:5413,71:5514,72:5615,73:5716,74:5817,75:5919,76:6020,77:6121,78:6223,79:6324,80:6426,81:6528,82:6628,83:6730,84:6891,85:6932,86:7034,87:7135,88:7236,89:7337,90:7437,91:7538,92:7638,93:7739,94:7839,95:7938,96:8038,97:8137,98:8236,99:8335,100:8433,101:8531,102:8629,103:8726,104:8823,105:8919,106:9015,107:9111,108:9206,109:9301,110:9395,111:9489,112:9581,113:9674,114:9766,115:9857,116:9948,117:10037,118:10127,119:10216,120:10304,121:10390,122:10477,123:10563,124:10647,125:10732,126:10815,127:10897,128:10978,129:11058,130:11138,131:11215,132:11293,133:11368,134:11444,135:11517,136:11590,137:11661,138:11732,139:11800,140:11867,141:11932,142:11997,143:12059,144:12120,145:12179,146:12236,147:12299,148:12346,149:12398,150:12447,151:12493,152:12537,153:12579,154:12617,155:12653,156:12684,157:12712,158:12734,159:12751};
+const MAX_LT={1:6440,2:12751,3:12751};
 
-function cmToLitri(cisterna, cm) {
-  const tab = cisterna === 1 ? TAB1 : TAB23;
-  const c = Math.round(cm);
-  if (c <= 0) return 0;
-  if (tab[c]) return tab[c];
-  const maxCm = cisterna === 1 ? 126 : 159;
-  if (c >= maxCm) return MAX_LT[cisterna];
-  // interpolazione lineare
-  const lo = Math.floor(c), hi = Math.ceil(c);
-  if (tab[lo] && tab[hi]) return Math.round(tab[lo] + (tab[hi]-tab[lo])*(c-lo)/(hi-lo));
+function cmToLitri(cist,cm){
+  const tab=cist===1?TAB1:TAB23,c=Math.round(cm);
+  if(c<=0)return 0;if(tab[c])return tab[c];
+  const mx=cist===1?126:159;if(c>=mx)return MAX_LT[cist];
+  const lo=Math.floor(c),hi=Math.ceil(c);
+  if(tab[lo]&&tab[hi])return Math.round(tab[lo]+(tab[hi]-tab[lo])*(c-lo)/(hi-lo));
   return null;
 }
 
 // ============================================================
-// STORAGE
+// GOOGLE DRIVE SYNC
 // ============================================================
-function loadData() {
-  return JSON.parse(localStorage.getItem('distributore_data') || 'null') || getInitialData();
-}
-function saveData(d) { localStorage.setItem('distributore_data', JSON.stringify(d)); }
+let tokenClient, accessToken=null, driveFileId=null;
+let DATA = getInitialData();
 
-function getInitialData() {
-  return {
-    cisterne: {
-      1: { cm: 113, litri: 6079 },
-      2: { cm: 74, litri: 5817 },
-      3: { cm: 122, litri: 10477 }
-    },
-    contatori: {
-      p1: 1202396, p2: 1409854, p3: 571457, p4: 78066
-    },
-    carichi: [{
-      id: 1,
-      num_scarico: 5,
-      das: '26IT5452726ANO00001O9',
-      data: '2026-05-11',
-      ora: '06:45',
-      fornitore: 'Italiana Petroli / API Raffineria Ancona',
-      trasportatore: 'Transadriatico Soc. Cooperativa',
-      autista: 'Tessuto Raffaele Fabio',
-      targa: 'EZ050FR / XA624NT',
-      note: 'Piano carico: 5417',
-      c1: { litri_pre: 3027, cm_pre: 60, litri_caricati: 3000, litri_post: 6079, cm_post: 113 },
-      c2: { litri_pre: 883, cm_pre: 19, litri_caricati: 5000, litri_post: 5817, cm_post: 74 },
-      c3: { litri_pre: 5413, cm_pre: 70, litri_caricati: 5000, litri_post: 10477, cm_post: 122 },
-      contatori: { p1: 1202396, p2: 1409854, p3: 571457, p4: 78066 },
-      files: []
-    }],
-    misure: [],
-    letture_contatori: []
-  };
+function getInitialData(){
+  return{soglia:1800,
+    cisterne:{1:{cm:113,litri:6079},2:{cm:74,litri:5817},3:{cm:122,litri:10477}},
+    contatori:{p1:1202396,p2:1409854,p3:571457,p4:78066},
+    carichi:[{id:1,num_scarico:5,das:'26IT5452726ANO00001O9',data:'2026-05-11',ora:'06:45',fornitore:'Italiana Petroli / API Raffineria Ancona',trasportatore:'Transadriatico Soc. Cooperativa',autista:'Tessuto Raffaele Fabio',targa:'EZ050FR / XA624NT',note:'Piano carico: 5417',c1:{cm_pre:60,litri_pre:3027,litri_caricati:3000,cm_post:113,litri_post:6079},c2:{cm_pre:19,litri_pre:883,litri_caricati:5000,cm_post:74,litri_post:5817},c3:{cm_pre:70,litri_pre:5413,litri_caricati:5000,cm_post:122,litri_post:10477},contatori:{p1:1202396,p2:1409854,p3:571457,p4:78066},files:[]}],
+    misure:[],letture_contatori:[]};
 }
 
-let DATA = loadData();
-
-// ============================================================
-// NAVIGATION
-// ============================================================
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.querySelectorAll('.nav-tab').forEach(t => { if(t.textContent.toLowerCase().includes(id.replace('dashboard','dashboard').replace('carico','carico').replace('contatori','contatori').replace('storico','storico').replace('calcolatore','calcolatore'))) t.classList.add('active'); });
-  if (id === 'dashboard') renderDashboard();
-  if (id === 'storico') renderStorico();
-  if (id === 'contatori') renderContatori();
-  if (id === 'carico') populateCaricoDefaults();
+function setDriveStatus(state, label){
+  const dot=document.getElementById('drive-dot');
+  const lbl=document.getElementById('drive-label');
+  dot.className='drive-dot '+(state||'');
+  lbl.textContent=label||'Drive';
+  lbl.style.color=state==='ok'?'var(--accent-verde)':state==='err'?'var(--accent-danger)':'var(--muted)';
 }
 
-// ============================================================
-// CLOCK
-// ============================================================
-function updateClock() {
-  const n = new Date();
-  document.getElementById('nav-clock').textContent = n.toLocaleDateString('it-IT') + ' ' + n.toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'});
+function handleLogin(){
+  tokenClient.requestAccessToken({prompt:'consent'});
 }
-setInterval(updateClock, 1000); updateClock();
 
-// ============================================================
-// DASHBOARD
-// ============================================================
-function renderDashboard() {
-  const d = DATA;
-  [1,2,3].forEach(i => {
-    const c = d.cisterne[i];
-    const lt = c.litri;
-    const max = MAX_LT[i];
-    const pct = Math.round(lt / max * 100);
-    const tipo = i === 2 ? 'verde' : 'diesel';
-    const isAlert = lt < SOGLIA;
-    const card = document.getElementById('card-c' + i);
-    card.classList.toggle('alert', isAlert);
-    const litriEl = document.getElementById('c' + i + '-litri');
-    litriEl.textContent = lt.toLocaleString('it-IT');
-    litriEl.className = 'cisterna-litri ' + (isAlert ? 'alert' : tipo);
-    document.getElementById('c' + i + '-cm').textContent = c.cm + ' cm';
-    document.getElementById('c' + i + '-bar').style.width = pct + '%';
-    document.getElementById('c' + i + '-bar').className = 'cisterna-bar ' + (isAlert ? 'alert' : tipo);
-    document.getElementById('c' + i + '-pct').textContent = pct + '%';
-    let badge = card.querySelector('.badge-alert');
-    if (isAlert) { if (!badge) { badge = document.createElement('div'); badge.className = 'badge-alert'; badge.textContent = 'SOTTO SOGLIA'; card.appendChild(badge); } }
-    else { if (badge) badge.remove(); }
+function handleLogout(){
+  if(!confirm('Disconnettersi da Google?'))return;
+  google.accounts.oauth2.revoke(accessToken,()=>{
+    accessToken=null; driveFileId=null;
+    localStorage.removeItem('dist_token');
+    document.getElementById('login-screen').classList.remove('hidden');
+    setDriveStatus('','Drive');
   });
-  const ct = d.contatori;
-  ['p1','p2','p3','p4'].forEach((p,i) => {
-    document.getElementById(p + '-tot').textContent = ct[p].toLocaleString('it-IT');
+}
+
+async function initDrive(){
+  // Try saved token
+  const saved = localStorage.getItem('dist_token');
+  if(saved){
+    accessToken=saved;
+    setDriveStatus('sync','Carico...');
+    try{
+      await loadFromDrive();
+      document.getElementById('login-screen').classList.add('hidden');
+      renderDashboard();
+      updateAccountInfo();
+      return;
+    }catch(e){
+      accessToken=null;
+      localStorage.removeItem('dist_token');
+    }
+  }
+  document.getElementById('login-screen').classList.remove('hidden');
+}
+
+function onGoogleLoad(){
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: async(resp)=>{
+      if(resp.error){setDriveStatus('err','Errore');return;}
+      accessToken=resp.access_token;
+      localStorage.setItem('dist_token',accessToken);
+      setDriveStatus('sync','Carico...');
+      try{
+        await loadFromDrive();
+        document.getElementById('login-screen').classList.add('hidden');
+        renderDashboard();
+        updateAccountInfo();
+      }catch(e){
+        setDriveStatus('err','Errore Drive');
+        showToast('Errore connessione Drive');
+      }
+    }
   });
+  initDrive();
+}
 
-  // last update
-  const allEvents = [];
-  d.carichi.forEach(c => allEvents.push({dt: c.data + 'T' + c.ora, tipo:'carico', ref: 'DAS ' + c.das, c1: '+'+c.c1.litri_caricati+'lt', c2: '+'+c.c2.litri_caricati+'lt', c3: '+'+c.c3.litri_caricati+'lt', note: 'Scarico #'+c.num_scarico}));
-  d.misure.forEach(m => allEvents.push({dt: m.data + 'T' + m.ora, tipo:'misura', ref:'Misura manuale', c1: m.c1?m.c1+'cm / '+cmToLitri(1,m.c1)+'lt':'—', c2: m.c2?m.c2+'cm / '+cmToLitri(2,m.c2)+'lt':'—', c3: m.c3?m.c3+'cm / '+cmToLitri(3,m.c3)+'lt':'—', note:''}));
-  allEvents.sort((a,b) => b.dt.localeCompare(a.dt));
+function updateAccountInfo(){
+  fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+accessToken}})
+    .then(r=>r.json()).then(u=>{
+      const el=document.getElementById('account-info');
+      if(el)el.textContent=u.email||'Connesso';
+    }).catch(()=>{});
+}
 
-  const tbody = document.getElementById('dashboard-tbody');
-  tbody.innerHTML = '';
-  allEvents.slice(0,8).forEach(e => {
-    const tr = document.createElement('tr');
-    const dt = e.dt.replace('T',' ');
-    const tipoTag = e.tipo==='carico'?'<span class="tag tag-carico">carico</span>':'<span class="tag" style="background:rgba(136,136,136,0.12);color:var(--muted)">misura</span>';
-    tr.innerHTML = `<td class="mono" style="font-size:11px">${dt}</td><td>${tipoTag}</td><td style="font-size:11px">${e.ref}</td><td style="font-size:11px;font-family:var(--font-mono)">C1:${e.c1} C2:${e.c2} C3:${e.c3}</td><td style="font-size:11px;color:var(--muted)">${e.note}</td>`;
-    tbody.appendChild(tr);
+async function findOrCreateFile(){
+  // Search in appDataFolder
+  const search = await fetch(
+    `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${FILE_NAME}'&fields=files(id,name)`,
+    {headers:{Authorization:'Bearer '+accessToken}}
+  );
+  const res = await search.json();
+  if(res.files && res.files.length>0){
+    driveFileId=res.files[0].id;
+    return driveFileId;
+  }
+  // Create new file
+  const meta={name:FILE_NAME,parents:['appDataFolder']};
+  const create = await fetch('https://www.googleapis.com/drive/v3/files',{
+    method:'POST',
+    headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+    body:JSON.stringify(meta)
   });
+  const f=await create.json();
+  driveFileId=f.id;
+  return driveFileId;
+}
 
-  if (allEvents.length > 0) {
-    const last = allEvents[0];
-    document.getElementById('last-update-label').textContent = 'Ultimo aggiornamento: ' + last.dt.replace('T',' ');
+async function loadFromDrive(){
+  const id=await findOrCreateFile();
+  const res=await fetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`,{
+    headers:{Authorization:'Bearer '+accessToken}
+  });
+  if(res.status===200){
+    const text=await res.text();
+    if(text&&text.trim()){
+      try{DATA=JSON.parse(text);}catch(e){DATA=getInitialData();}
+    }
+  }
+  setDriveStatus('ok','Drive ✓');
+}
+
+async function saveToDrive(){
+  if(!accessToken){showToast('Non connesso a Drive');return;}
+  setDriveStatus('sync','Salvo...');
+  try{
+    if(!driveFileId)await findOrCreateFile();
+    const content=JSON.stringify(DATA);
+    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,{
+      method:'PATCH',
+      headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:content
+    });
+    setDriveStatus('ok','Drive ✓');
+  }catch(e){
+    setDriveStatus('err','Errore salvataggio');
+    showToast('Errore salvataggio Drive');
   }
 }
 
 // ============================================================
-// MISURA SALTUARIA
+// NAVIGATION
 // ============================================================
-function openMisura() {
-  const now = new Date();
-  document.getElementById('m-data').value = now.toISOString().slice(0,10);
-  document.getElementById('m-ora').value = now.toTimeString().slice(0,5);
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const map={dashboard:0,carico:1,contatori:2,storico:3,calcolatore:4,impostazioni:5};
+  if(map[id]!==undefined)document.querySelectorAll('.nav-tab')[map[id]].classList.add('active');
+  if(id==='dashboard')renderDashboard();
+  if(id==='storico')renderStorico();
+  if(id==='contatori')renderContatori();
+  if(id==='carico')populateCaricoDefaults();
+  if(id==='impostazioni'){document.getElementById('soglia-input').value=DATA.soglia||1800;}
+}
+
+function updateClock(){const n=new Date();document.getElementById('nav-clock').textContent=n.toLocaleDateString('it-IT')+' '+n.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});}
+setInterval(updateClock,1000);updateClock();
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard(){
+  const soglia=DATA.soglia||1800;
+  [1,2,3].forEach(i=>{
+    const c=DATA.cisterne[i],lt=c.litri,max=MAX_LT[i],pct=Math.round(lt/max*100);
+    const tipo=i===2?'verde':'diesel',isAlert=lt<soglia;
+    const card=document.getElementById('card-c'+i);
+    card.classList.toggle('alert',isAlert);
+    const el=document.getElementById('c'+i+'-litri');
+    el.textContent=lt.toLocaleString('it-IT');el.className='cisterna-litri '+(isAlert?'alert':tipo);
+    document.getElementById('c'+i+'-cm').textContent=c.cm+' cm';
+    document.getElementById('c'+i+'-bar').style.width=pct+'%';
+    document.getElementById('c'+i+'-bar').className='cisterna-bar '+(isAlert?'alert':tipo);
+    document.getElementById('c'+i+'-pct').textContent=pct+'%';
+    let b=card.querySelector('.badge-alert');
+    if(isAlert){if(!b){b=document.createElement('div');b.className='badge-alert';b.textContent='SOTTO SOGLIA';card.appendChild(b);}}
+    else{if(b)b.remove();}
+  });
+  ['p1','p2','p3','p4'].forEach(p=>document.getElementById(p+'-tot').textContent=DATA.contatori[p].toLocaleString('it-IT'));
+  const evs=[];
+  DATA.carichi.forEach(c=>evs.push({dt:c.data+'T'+c.ora,tipo:'carico',ref:'Scarico #'+c.num_scarico+' · '+c.das,c1:'+'+c.c1.litri_caricati+' lt',c2:'+'+c.c2.litri_caricati+' lt',c3:'+'+c.c3.litri_caricati+' lt'}));
+  DATA.misure.forEach(m=>evs.push({dt:m.data+'T'+m.ora,tipo:'misura',ref:'Misura manuale',c1:m.c1?(m.c1+'cm/'+cmToLitri(1,m.c1)+'lt'):'—',c2:m.c2?(m.c2+'cm/'+cmToLitri(2,m.c2)+'lt'):'—',c3:m.c3?(m.c3+'cm/'+cmToLitri(3,m.c3)+'lt'):'—'}));
+  evs.sort((a,b)=>b.dt.localeCompare(a.dt));
+  const tbody=document.getElementById('dashboard-tbody');tbody.innerHTML='';
+  evs.slice(0,10).forEach(e=>{
+    const tr=document.createElement('tr');
+    const tag=e.tipo==='carico'?'<span class="tag tag-carico">carico</span>':'<span class="tag" style="background:rgba(136,136,136,0.12);color:var(--muted)">misura</span>';
+    tr.innerHTML=`<td class="mono" style="font-size:11px">${e.dt.replace('T',' ')}</td><td>${tag}</td><td style="font-size:11px;color:var(--muted)">${e.ref}</td><td class="mono" style="font-size:11px">${e.c1}</td><td class="mono" style="font-size:11px">${e.c2}</td><td class="mono" style="font-size:11px">${e.c3}</td>`;
+    tbody.appendChild(tr);
+  });
+  if(evs.length>0)document.getElementById('last-update-label').textContent='Ultimo aggiornamento: '+evs[0].dt.replace('T',' ');
+  const sd=document.getElementById('soglia-display');if(sd)sd.textContent=(DATA.soglia||1800).toLocaleString('it-IT');
+}
+
+// ============================================================
+// MISURA
+// ============================================================
+function openMisura(){
+  const now=new Date();
+  document.getElementById('m-data').value=now.toISOString().slice(0,10);
+  document.getElementById('m-ora').value=now.toTimeString().slice(0,5);
+  ['m-c1','m-c2','m-c3'].forEach(id=>document.getElementById(id).value='');
+  ['m-c1-hint','m-c2-hint','m-c3-hint'].forEach(id=>document.getElementById(id).textContent='→ — litri');
   document.getElementById('modal-misura').classList.add('open');
 }
-function updateMisuraHint(n) {
-  const v = parseInt(document.getElementById('m-c'+n).value);
-  const hint = document.getElementById('m-c'+n+'-hint');
-  if (!isNaN(v) && v > 0) {
-    const lt = cmToLitri(n, v);
-    hint.textContent = lt !== null ? '→ ' + lt.toLocaleString('it-IT') + ' litri' : '→ fuori range';
-  } else hint.textContent = '→ — litri';
+function updateMisuraHint(n){
+  const v=parseInt(document.getElementById('m-c'+n).value),hint=document.getElementById('m-c'+n+'-hint');
+  if(!isNaN(v)&&v>0){const lt=cmToLitri(n,v);hint.textContent=lt!==null?'→ '+lt.toLocaleString('it-IT')+' litri':'→ fuori range';}
+  else hint.textContent='→ — litri';
 }
-function salvaMisura() {
-  const data = document.getElementById('m-data').value;
-  const ora = document.getElementById('m-ora').value;
-  const c1 = document.getElementById('m-c1').value;
-  const c2 = document.getElementById('m-c2').value;
-  const c3 = document.getElementById('m-c3').value;
-  if (!data || !ora) { showToast('Inserisci data e ora'); return; }
-  const m = { data, ora, c1: c1?parseInt(c1):null, c2: c2?parseInt(c2):null, c3: c3?parseInt(c3):null };
+async function salvaMisura(){
+  const data=document.getElementById('m-data').value,ora=document.getElementById('m-ora').value;
+  if(!data||!ora){showToast('Inserisci data e ora');return;}
+  const c1=document.getElementById('m-c1').value,c2=document.getElementById('m-c2').value,c3=document.getElementById('m-c3').value;
+  if(!c1&&!c2&&!c3){showToast('Inserisci almeno una misura');return;}
+  const m={data,ora,c1:c1?parseInt(c1):null,c2:c2?parseInt(c2):null,c3:c3?parseInt(c3):null};
   DATA.misure.push(m);
-  if (c1) { DATA.cisterne[1] = { cm: parseInt(c1), litri: cmToLitri(1, parseInt(c1)) }; }
-  if (c2) { DATA.cisterne[2] = { cm: parseInt(c2), litri: cmToLitri(2, parseInt(c2)) }; }
-  if (c3) { DATA.cisterne[3] = { cm: parseInt(c3), litri: cmToLitri(3, parseInt(c3)) }; }
-  saveData(DATA);
-  closeModal('modal-misura');
-  renderDashboard();
-  showToast('Misura salvata');
-  ['m-c1','m-c2','m-c3'].forEach(id => document.getElementById(id).value = '');
+  if(c1)DATA.cisterne[1]={cm:parseInt(c1),litri:cmToLitri(1,parseInt(c1))};
+  if(c2)DATA.cisterne[2]={cm:parseInt(c2),litri:cmToLitri(2,parseInt(c2))};
+  if(c3)DATA.cisterne[3]={cm:parseInt(c3),litri:cmToLitri(3,parseInt(c3))};
+  await saveToDrive();
+  closeModal('modal-misura');renderDashboard();showToast('Misura salvata ✓');
 }
 
 // ============================================================
 // CARICO
 // ============================================================
-function populateCaricoDefaults() {
-  const now = new Date();
-  document.getElementById('c-data').value = now.toISOString().slice(0,10);
-  document.getElementById('c-ora').value = now.toTimeString().slice(0,5);
-  const nextNum = DATA.carichi.length > 0 ? Math.max(...DATA.carichi.map(c => c.num_scarico)) + 1 : 1;
-  document.getElementById('c-num-scarico').value = nextNum;
-  document.getElementById('c-c1-current').textContent = DATA.cisterne[1].litri.toLocaleString('it-IT') + ' lt (' + DATA.cisterne[1].cm + ' cm)';
-  document.getElementById('c-c2-current').textContent = DATA.cisterne[2].litri.toLocaleString('it-IT') + ' lt (' + DATA.cisterne[2].cm + ' cm)';
-  document.getElementById('c-c3-current').textContent = DATA.cisterne[3].litri.toLocaleString('it-IT') + ' lt (' + DATA.cisterne[3].cm + ' cm)';
+function populateCaricoDefaults(){
+  const now=new Date();
+  document.getElementById('c-data').value=now.toISOString().slice(0,10);
+  document.getElementById('c-ora').value=now.toTimeString().slice(0,5);
+  const next=DATA.carichi.length>0?Math.max(...DATA.carichi.map(c=>c.num_scarico))+1:1;
+  document.getElementById('c-num-scarico').value=next;
+  document.getElementById('c-c1-current').textContent=DATA.cisterne[1].litri.toLocaleString('it-IT')+' lt ('+DATA.cisterne[1].cm+' cm)';
+  document.getElementById('c-c2-current').textContent=DATA.cisterne[2].litri.toLocaleString('it-IT')+' lt ('+DATA.cisterne[2].cm+' cm)';
+  document.getElementById('c-c3-current').textContent=DATA.cisterne[3].litri.toLocaleString('it-IT')+' lt ('+DATA.cisterne[3].cm+' cm)';
+}
+function updateLitriCarico(n,when){
+  const v=parseInt(document.getElementById('c-c'+n+'-cm-'+when).value),hint=document.getElementById('c-c'+n+'-lt-'+when);
+  if(!isNaN(v)&&v>0){const lt=cmToLitri(n,v);hint.textContent=lt!==null?'→ '+lt.toLocaleString('it-IT')+' litri':'→ fuori range';}
+  else hint.textContent='→ — litri';
 }
 
-function updateLitriCarico(n, when) {
-  const id = 'c-c' + n + '-cm-' + when;
-  const hintId = 'c-c' + n + '-lt-' + when;
-  const v = parseInt(document.getElementById(id).value);
-  const hint = document.getElementById(hintId);
-  if (!isNaN(v) && v > 0) {
-    const lt = cmToLitri(n, v);
-    hint.textContent = lt !== null ? '→ ' + lt.toLocaleString('it-IT') + ' litri' : '→ fuori range';
-  } else hint.textContent = '→ — litri';
-}
+let pendingFiles=[];
+function handleFiles(files){for(const f of files){const r=new FileReader();r.onload=e=>{pendingFiles.push({name:f.name,data:e.target.result});renderFileList();};r.readAsDataURL(f);}}
+function renderFileList(){const fl=document.getElementById('file-list');fl.innerHTML='';pendingFiles.forEach((f,i)=>{const c=document.createElement('div');c.className='file-chip';c.innerHTML=`📎 ${f.name} <button onclick="removeFile(${i})">×</button>`;fl.appendChild(c);});}
+function removeFile(i){pendingFiles.splice(i,1);renderFileList();}
 
-let pendingFiles = [];
-function handleFiles(files) {
-  for (const f of files) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      pendingFiles.push({ name: f.name, data: e.target.result });
-      renderFileList();
-    };
-    reader.readAsDataURL(f);
-  }
-}
-function renderFileList() {
-  const fl = document.getElementById('file-list');
-  fl.innerHTML = '';
-  pendingFiles.forEach((f, i) => {
-    const chip = document.createElement('div');
-    chip.className = 'file-chip';
-    chip.innerHTML = `📎 ${f.name} <button onclick="removeFile(${i})">×</button>`;
-    fl.appendChild(chip);
-  });
-}
-function removeFile(i) { pendingFiles.splice(i, 1); renderFileList(); }
-
-function salvaCarico() {
-  const numScarico = parseInt(document.getElementById('c-num-scarico').value);
-  const das = document.getElementById('c-das').value;
-  const data = document.getElementById('c-data').value;
-  const ora = document.getElementById('c-ora').value;
-  if (!data || !ora || !numScarico) { showToast('Inserisci almeno numero scarico, data e ora'); return; }
-
-  const getCm = (id) => { const v = document.getElementById(id).value; return v ? parseInt(v) : null; };
-  const getLt = (id) => { const v = document.getElementById(id).value; return v ? parseInt(v) : 0; };
-
-  const c1cmPre = getCm('c-c1-cm-pre'), c1cmPost = getCm('c-c1-cm-post');
-  const c2cmPre = getCm('c-c2-cm-pre'), c2cmPost = getCm('c-c2-cm-post');
-  const c3cmPre = getCm('c-c3-cm-pre'), c3cmPost = getCm('c-c3-cm-post');
-
-  const carico = {
-    id: Date.now(),
-    num_scarico: numScarico,
-    das,
-    data,
-    ora,
-    fornitore: document.getElementById('c-fornitore').value,
-    trasportatore: document.getElementById('c-trasportatore').value,
-    autista: document.getElementById('c-autista').value,
-    targa: document.getElementById('c-targa').value,
-    note: document.getElementById('c-note').value,
-    c1: {
-      cm_pre: c1cmPre,
-      litri_pre: c1cmPre ? cmToLitri(1, c1cmPre) : null,
-      litri_caricati: getLt('c-c1-litri'),
-      cm_post: c1cmPost,
-      litri_post: c1cmPost ? cmToLitri(1, c1cmPost) : null
-    },
-    c2: {
-      cm_pre: c2cmPre,
-      litri_pre: c2cmPre ? cmToLitri(2, c2cmPre) : null,
-      litri_caricati: getLt('c-c2-litri'),
-      cm_post: c2cmPost,
-      litri_post: c2cmPost ? cmToLitri(2, c2cmPost) : null
-    },
-    c3: {
-      cm_pre: c3cmPre,
-      litri_pre: c3cmPre ? cmToLitri(3, c3cmPre) : null,
-      litri_caricati: getLt('c-c3-litri'),
-      cm_post: c3cmPost,
-      litri_post: c3cmPost ? cmToLitri(3, c3cmPost) : null
-    },
-    contatori: {
-      p1: getLt('c-p1-counter') || DATA.contatori.p1,
-      p2: getLt('c-p2-counter') || DATA.contatori.p2,
-      p3: getLt('c-p3-counter') || DATA.contatori.p3,
-      p4: getLt('c-p4-counter') || DATA.contatori.p4
-    },
-    files: [...pendingFiles]
+async function salvaCarico(){
+  const num=parseInt(document.getElementById('c-num-scarico').value);
+  const data=document.getElementById('c-data').value,ora=document.getElementById('c-ora').value;
+  if(!data||!ora||!num){showToast('Inserisci numero scarico, data e ora');return;}
+  const gC=id=>{const v=document.getElementById(id).value;return v?parseInt(v):null;};
+  const gL=id=>{const v=document.getElementById(id).value;return v?parseInt(v):0;};
+  const c1pre=gC('c-c1-cm-pre'),c1post=gC('c-c1-cm-post');
+  const c2pre=gC('c-c2-cm-pre'),c2post=gC('c-c2-cm-post');
+  const c3pre=gC('c-c3-cm-pre'),c3post=gC('c-c3-cm-post');
+  const carico={
+    id:Date.now(),num_scarico:num,
+    das:document.getElementById('c-das').value,data,ora,
+    fornitore:document.getElementById('c-fornitore').value,
+    trasportatore:document.getElementById('c-trasportatore').value,
+    autista:document.getElementById('c-autista').value,
+    targa:document.getElementById('c-targa').value,
+    note:document.getElementById('c-note').value,
+    c1:{cm_pre:c1pre,litri_pre:c1pre?cmToLitri(1,c1pre):null,litri_caricati:gL('c-c1-litri'),cm_post:c1post,litri_post:c1post?cmToLitri(1,c1post):null},
+    c2:{cm_pre:c2pre,litri_pre:c2pre?cmToLitri(2,c2pre):null,litri_caricati:gL('c-c2-litri'),cm_post:c2post,litri_post:c2post?cmToLitri(2,c2post):null},
+    c3:{cm_pre:c3pre,litri_pre:c3pre?cmToLitri(3,c3pre):null,litri_caricati:gL('c-c3-litri'),cm_post:c3post,litri_post:c3post?cmToLitri(3,c3post):null},
+    contatori:{p1:gL('c-p1-counter')||DATA.contatori.p1,p2:gL('c-p2-counter')||DATA.contatori.p2,p3:gL('c-p3-counter')||DATA.contatori.p3,p4:gL('c-p4-counter')||DATA.contatori.p4},
+    files:[...pendingFiles]
   };
-
-  // Aggiorna stato cisterne
-  if (c1cmPost) DATA.cisterne[1] = { cm: c1cmPost, litri: cmToLitri(1, c1cmPost) };
-  if (c2cmPost) DATA.cisterne[2] = { cm: c2cmPost, litri: cmToLitri(2, c2cmPost) };
-  if (c3cmPost) DATA.cisterne[3] = { cm: c3cmPost, litri: cmToLitri(3, c3cmPost) };
-  if (carico.contatori.p1) DATA.contatori.p1 = carico.contatori.p1;
-  if (carico.contatori.p2) DATA.contatori.p2 = carico.contatori.p2;
-  if (carico.contatori.p3) DATA.contatori.p3 = carico.contatori.p3;
-  if (carico.contatori.p4) DATA.contatori.p4 = carico.contatori.p4;
-
+  if(c1post)DATA.cisterne[1]={cm:c1post,litri:cmToLitri(1,c1post)};
+  if(c2post)DATA.cisterne[2]={cm:c2post,litri:cmToLitri(2,c2post)};
+  if(c3post)DATA.cisterne[3]={cm:c3post,litri:cmToLitri(3,c3post)};
+  ['p1','p2','p3','p4'].forEach(p=>{if(carico.contatori[p])DATA.contatori[p]=carico.contatori[p];});
   DATA.carichi.push(carico);
-  saveData(DATA);
-  pendingFiles = [];
-  renderFileList();
-  showToast('Carico #' + numScarico + ' salvato');
+  await saveToDrive();
+  pendingFiles=[];renderFileList();
+  showToast('Carico #'+num+' salvato ✓');
   generaReport(carico);
 }
-
-function clearCaricoForm() {
-  ['c-num-scarico','c-das','c-fornitore','c-trasportatore','c-autista','c-targa','c-note',
-   'c-c1-cm-pre','c-c1-litri','c-c1-cm-post','c-c2-cm-pre','c-c2-litri','c-c2-cm-post',
-   'c-c3-cm-pre','c-c3-litri','c-c3-cm-post','c-p1-counter','c-p2-counter','c-p3-counter','c-p4-counter'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  pendingFiles = [];
-  renderFileList();
+function clearCaricoForm(){
+  ['c-num-scarico','c-das','c-fornitore','c-trasportatore','c-autista','c-targa','c-note','c-c1-cm-pre','c-c1-litri','c-c1-cm-post','c-c2-cm-pre','c-c2-litri','c-c2-cm-post','c-c3-cm-pre','c-c3-litri','c-c3-cm-post','c-p1-counter','c-p2-counter','c-p3-counter','c-p4-counter'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  pendingFiles=[];renderFileList();
 }
 
 // ============================================================
 // CONTATORI
 // ============================================================
-function salvaContatori() {
-  const data = document.getElementById('ct-data').value;
-  const ora = document.getElementById('ct-ora').value;
-  if (!data || !ora) { showToast('Inserisci data e ora'); return; }
-  const lettura = {
-    data, ora,
-    p1: document.getElementById('ct-p1').value ? parseInt(document.getElementById('ct-p1').value) : null,
-    p2: document.getElementById('ct-p2').value ? parseInt(document.getElementById('ct-p2').value) : null,
-    p3: document.getElementById('ct-p3').value ? parseInt(document.getElementById('ct-p3').value) : null,
-    p4: document.getElementById('ct-p4').value ? parseInt(document.getElementById('ct-p4').value) : null,
-  };
-  DATA.letture_contatori.push(lettura);
-  if (lettura.p1 !== null) DATA.contatori.p1 = lettura.p1;
-  if (lettura.p2 !== null) DATA.contatori.p2 = lettura.p2;
-  if (lettura.p3 !== null) DATA.contatori.p3 = lettura.p3;
-  if (lettura.p4 !== null) DATA.contatori.p4 = lettura.p4;
-  saveData(DATA);
-  renderContatori();
-  showToast('Lettura contatori salvata');
-  ['ct-p1','ct-p2','ct-p3','ct-p4'].forEach(id => document.getElementById(id).value = '');
+async function salvaContatori(){
+  const data=document.getElementById('ct-data').value,ora=document.getElementById('ct-ora').value;
+  if(!data||!ora){showToast('Inserisci data e ora');return;}
+  const l={data,ora,
+    p1:document.getElementById('ct-p1').value?parseInt(document.getElementById('ct-p1').value):null,
+    p2:document.getElementById('ct-p2').value?parseInt(document.getElementById('ct-p2').value):null,
+    p3:document.getElementById('ct-p3').value?parseInt(document.getElementById('ct-p3').value):null,
+    p4:document.getElementById('ct-p4').value?parseInt(document.getElementById('ct-p4').value):null};
+  DATA.letture_contatori.push(l);
+  ['p1','p2','p3','p4'].forEach(p=>{if(l[p]!==null)DATA.contatori[p]=l[p];});
+  await saveToDrive();renderContatori();showToast('Lettura salvata ✓');
+  ['ct-p1','ct-p2','ct-p3','ct-p4'].forEach(id=>document.getElementById(id).value='');
 }
-
-function filterFromLastCarico() {
-  if (DATA.carichi.length === 0) { showToast('Nessun carico registrato'); return; }
-  const lastCarico = DATA.carichi[DATA.carichi.length-1];
-  document.getElementById('ct-filter-da').value = lastCarico.data;
+function filterFromLastCarico(){
+  if(DATA.carichi.length===0){showToast('Nessun carico registrato');return;}
+  const last=DATA.carichi.reduce((a,b)=>(a.data+a.ora>b.data+b.ora?a:b));
+  document.getElementById('ct-filter-da').value=last.data;
+  document.getElementById('ct-filter-a').value='';
   renderContatori();
 }
-
-function renderContatori() {
-  const da = document.getElementById('ct-filter-da').value;
-  const a = document.getElementById('ct-filter-a').value;
-  const pompa = document.getElementById('ct-filter-pompa').value;
-
-  let rows = [...DATA.letture_contatori];
-  // Aggiungi anche letture dai carichi
-  DATA.carichi.forEach(c => {
-    if (c.contatori) rows.push({ data: c.data, ora: c.ora, p1: c.contatori.p1, p2: c.contatori.p2, p3: c.contatori.p3, p4: c.contatori.p4, _from: 'carico #'+c.num_scarico });
-  });
-  rows.sort((a,b) => (a.data+'T'+a.ora).localeCompare(b.data+'T'+b.ora));
-
-  if (da) rows = rows.filter(r => r.data >= da);
-  if (a) rows = rows.filter(r => r.data <= a);
-
-  const tbody = document.getElementById('contatori-tbody');
-  tbody.innerHTML = '';
-
-  rows.forEach((r, idx) => {
-    const prev = idx > 0 ? rows[idx-1] : null;
-    const deltaP = (p) => {
-      if (!prev || prev[p] === null || r[p] === null) return '—';
-      let d = r[p] - prev[p];
-      if (d < 0) d += 9999999; // reset
-      return '+' + d.toLocaleString('it-IT');
-    };
-    const tr = document.createElement('tr');
-    const highlight = pompa ? '' : '';
-    const fmt = (v) => v !== null && v !== undefined ? v.toLocaleString('it-IT') : '—';
-    tr.innerHTML = `
-      <td class="mono" style="font-size:11px">${r.data} ${r.ora}${r._from?' <span style="color:var(--muted);font-size:10px">('+r._from+')</span>':''}</td>
-      <td class="mono" style="font-size:12px;color:var(--accent-verde)">${fmt(r.p1)}</td>
-      <td class="mono" style="font-size:12px;color:var(--accent-verde)">${fmt(r.p2)}</td>
-      <td class="mono" style="font-size:12px;color:var(--accent-diesel)">${fmt(r.p3)}</td>
-      <td class="mono" style="font-size:12px;color:var(--accent-diesel)">${fmt(r.p4)}</td>
-      <td style="font-size:11px;color:var(--muted)">P1:${deltaP('p1')} P2:${deltaP('p2')} P3:${deltaP('p3')} P4:${deltaP('p4')}</td>`;
+function renderContatori(){
+  const da=document.getElementById('ct-filter-da').value,a=document.getElementById('ct-filter-a').value;
+  let rows=[...DATA.letture_contatori];
+  DATA.carichi.forEach(c=>{if(c.contatori)rows.push({data:c.data,ora:c.ora,p1:c.contatori.p1,p2:c.contatori.p2,p3:c.contatori.p3,p4:c.contatori.p4,_ref:'carico #'+c.num_scarico});});
+  rows.sort((a,b)=>(a.data+'T'+a.ora).localeCompare(b.data+'T'+b.ora));
+  if(da)rows=rows.filter(r=>r.data>=da);
+  if(a)rows=rows.filter(r=>r.data<=a);
+  const tbody=document.getElementById('contatori-tbody');tbody.innerHTML='';
+  rows.forEach((r,idx)=>{
+    const prev=idx>0?rows[idx-1]:null;
+    const delta=p=>{if(!prev||prev[p]===null||r[p]===null)return'—';let d=r[p]-prev[p];if(d<0)d+=9999999;return d>0?'+'+d.toLocaleString('it-IT'):'0';};
+    const fmt=v=>v!==null&&v!==undefined?v.toLocaleString('it-IT'):'—';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="mono" style="font-size:11px">${r.data} ${r.ora}${r._ref?' <span style="color:var(--muted);font-size:10px">('+r._ref+')</span>':''}</td><td class="mono" style="font-size:12px;color:var(--accent-verde)">${fmt(r.p1)}</td><td class="mono" style="font-size:12px;color:var(--accent-verde)">${fmt(r.p2)}</td><td class="mono" style="font-size:12px;color:var(--accent-diesel)">${fmt(r.p3)}</td><td class="mono" style="font-size:12px;color:var(--accent-diesel)">${fmt(r.p4)}</td><td style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">P1:${delta('p1')} P2:${delta('p2')} P3:${delta('p3')} P4:${delta('p4')}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -944,21 +760,11 @@ function renderContatori() {
 // ============================================================
 // STORICO
 // ============================================================
-function renderStorico() {
-  const tbody = document.getElementById('storico-tbody');
-  tbody.innerHTML = '';
-  const events = [...DATA.carichi].sort((a,b) => (b.data+'T'+b.ora).localeCompare(a.data+'T'+a.ora));
-  events.forEach(c => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="mono" style="font-size:11px">#${c.num_scarico}</td>
-      <td class="mono" style="font-size:11px">${c.data} ${c.ora}</td>
-      <td><span class="tag tag-carico">carico</span></td>
-      <td style="font-size:11px;color:var(--muted)">${c.das||'—'}</td>
-      <td style="font-size:11px;font-family:var(--font-mono)">+${c.c1.litri_caricati} lt</td>
-      <td style="font-size:11px;font-family:var(--font-mono)">+${c.c2.litri_caricati} lt</td>
-      <td style="font-size:11px;font-family:var(--font-mono)">+${c.c3.litri_caricati} lt</td>
-      <td><button class="btn btn-ghost btn-sm" onclick="generaReportById(${c.id})">📄 Report</button></td>`;
+function renderStorico(){
+  const tbody=document.getElementById('storico-tbody');tbody.innerHTML='';
+  [...DATA.carichi].sort((a,b)=>(b.data+b.ora).localeCompare(a.data+a.ora)).forEach(c=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td class="mono">#${c.num_scarico}</td><td class="mono" style="font-size:11px">${c.data} ${c.ora}</td><td style="font-size:11px;color:var(--muted)">${c.das||'—'}</td><td class="mono" style="font-size:11px">+${c.c1.litri_caricati} lt</td><td class="mono" style="font-size:11px">+${c.c2.litri_caricati} lt</td><td class="mono" style="font-size:11px">+${c.c3.litri_caricati} lt</td><td style="font-size:11px;color:var(--muted)">${c.autista||'—'}</td><td><button class="btn btn-ghost btn-sm" onclick="generaReportById(${c.id})">📄</button></td>`;
     tbody.appendChild(tr);
   });
 }
@@ -966,124 +772,75 @@ function renderStorico() {
 // ============================================================
 // CALCOLATORE
 // ============================================================
-function calcolaConversione() {
-  const cist = parseInt(document.getElementById('calc-cisterna').value);
-  const cm = parseFloat(document.getElementById('calc-cm').value);
-  const res = document.getElementById('calc-result');
-  if (isNaN(cm) || cm <= 0) { res.textContent = '— litri'; return; }
-  const lt = cmToLitri(cist, cm);
-  res.textContent = lt !== null ? lt.toLocaleString('it-IT') + ' litri' : 'Fuori range';
+function calcolaConversione(){
+  const cist=parseInt(document.getElementById('calc-cisterna').value),cm=parseFloat(document.getElementById('calc-cm').value),res=document.getElementById('calc-result');
+  if(isNaN(cm)||cm<=0){res.textContent='— litri';return;}
+  const lt=cmToLitri(cist,cm);res.textContent=lt!==null?lt.toLocaleString('it-IT')+' litri':'Fuori range';
 }
 
 // ============================================================
 // REPORT
 // ============================================================
-let currentReportText = '';
-
-function buildReportText(carico) {
-  const line = (label, val) => label.padEnd(32, '.') + ' ' + val;
-  const sep = '═'.repeat(56);
-  const sep2 = '─'.repeat(56);
-  const fmtCisterna = (label, c) => {
-    const lines = [];
-    lines.push('  ' + label.toUpperCase());
-    lines.push('  ' + sep2);
-    if (c.cm_pre !== null)
-      lines.push('  ' + line('Prima del carico', (c.cm_pre||'—') + ' cm = ' + (c.litri_pre||'—').toLocaleString('it-IT') + ' litri'));
-    lines.push('  ' + line('Litri caricati (DAS)', '+' + (c.litri_caricati||0).toLocaleString('it-IT') + ' litri'));
-    if (c.cm_post !== null)
-      lines.push('  ' + line('Dopo il carico', (c.cm_post||'—') + ' cm = ' + (c.litri_post||'—').toLocaleString('it-IT') + ' litri'));
-    return lines.join('\n');
+let currentReportText='';
+function buildReportText(c){
+  const L=(label,val)=>('  '+label).padEnd(38,'.')+' '+val;
+  const S='═'.repeat(58),S2='─'.repeat(58);
+  const fC=(label,cx)=>{
+    const ls=['  '+label.toUpperCase(),'  '+S2];
+    if(cx.cm_pre!==null)ls.push(L('Prima del carico',(cx.cm_pre||'—')+' cm = '+(cx.litri_pre||'—').toLocaleString('it-IT')+' litri'));
+    ls.push(L('Litri caricati (DAS)','+'+cx.litri_caricati.toLocaleString('it-IT')+' litri'));
+    if(cx.cm_post!==null)ls.push(L('Dopo il carico',(cx.cm_post||'—')+' cm = '+(cx.litri_post||'—').toLocaleString('it-IT')+' litri'));
+    return ls.join('\n');
   };
-
-  return [
-    sep,
-    '  REPORT CARICO CARBURANTI',
-    '  Stazione di Servizio Borsella Marco – Castelfidardo',
-    sep,
-    '',
-    line('  Numero Scarico', '#' + carico.num_scarico),
-    line('  Numero DAS', carico.das || '—'),
-    line('  Data', carico.data + ' ore ' + carico.ora),
-    line('  Fornitore', carico.fornitore || '—'),
-    line('  Trasportatore', carico.trasportatore || '—'),
-    line('  Autista', carico.autista || '—'),
-    line('  Targa', carico.targa || '—'),
-    carico.note ? line('  Note', carico.note) : '',
-    '',
-    sep,
-    '  LETTURE CONTATORI AL CARICO',
-    sep2,
-    '  ' + line('Pompa 1 (Verde)', (carico.contatori.p1||'—').toLocaleString('it-IT')),
-    '  ' + line('Pompa 2 (Verde)', (carico.contatori.p2||'—').toLocaleString('it-IT')),
-    '  ' + line('Pompa 3 (Gasolio)', (carico.contatori.p3||'—').toLocaleString('it-IT')),
-    '  ' + line('Pompa 4 (Gasolio)', (carico.contatori.p4||'—').toLocaleString('it-IT')),
-    '',
-    sep,
-    '  CISTERNE',
-    sep,
-    fmtCisterna('Cisterna 1 – Gasolio Piccola (Pompa 3)', carico.c1),
-    '',
-    fmtCisterna('Cisterna 2 – Verde (Pompe 1/2)', carico.c2),
-    '',
-    fmtCisterna('Cisterna 3 – Gasolio Grande (Pompa 4)', carico.c3),
-    '',
-    sep,
-    '  Report generato il ' + new Date().toLocaleString('it-IT'),
-    sep
-  ].filter(l => l !== undefined).join('\n');
+  return[S,'  REPORT CARICO CARBURANTI','  ALA CARBURANTI S.R.L. – VIA XXV APRILE 19 – CASTELFIDARDO',S,'',
+    L('Numero Scarico','#'+c.num_scarico),L('Numero DAS',c.das||'—'),L('Data / Ora',c.data+' ore '+c.ora),
+    L('Fornitore',c.fornitore||'—'),L('Trasportatore',c.trasportatore||'—'),L('Autista',c.autista||'—'),L('Targa',c.targa||'—'),
+    c.note?L('Note',c.note):'','',
+    S,'  CONTATORI POMPE AL MOMENTO DEL CARICO',S2,
+    L('Pompa 1 (Verde)',(c.contatori.p1||'—').toLocaleString('it-IT')),L('Pompa 2 (Verde)',(c.contatori.p2||'—').toLocaleString('it-IT')),
+    L('Pompa 3 (Gasolio)',(c.contatori.p3||'—').toLocaleString('it-IT')),L('Pompa 4 (Gasolio)',(c.contatori.p4||'—').toLocaleString('it-IT')),
+    '','',S,'  CISTERNE',S,'',
+    fC('Cisterna 1 – Gasolio Piccola (Pompa 3)',c.c1),'',
+    fC('Cisterna 2 – Verde (Pompe 1/2)',c.c2),'',
+    fC('Cisterna 3 – Gasolio Grande (Pompa 4)',c.c3),'',
+    S,'  Report generato: '+new Date().toLocaleString('it-IT'),S
+  ].filter(l=>l!==undefined).join('\n');
 }
+function generaReport(carico){currentReportText=buildReportText(carico);document.getElementById('report-num').textContent=carico.num_scarico;document.getElementById('report-content').textContent=currentReportText;document.getElementById('modal-report').classList.add('open');}
+function generaReportById(id){const c=DATA.carichi.find(x=>x.id===id);if(c)generaReport(c);}
+function esportaUltimoCarico(){if(DATA.carichi.length===0){showToast('Nessun carico salvato');return;}generaReport(DATA.carichi[DATA.carichi.length-1]);}
+function copyReport(){navigator.clipboard.writeText(currentReportText).then(()=>showToast('Copiato ✓'));}
+function downloadReport(){const b=new Blob([currentReportText],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='scarico_'+document.getElementById('report-num').textContent+'_'+new Date().toISOString().slice(0,10)+'.txt';a.click();}
 
-function generaReport(carico) {
-  currentReportText = buildReportText(carico);
-  document.getElementById('report-num').textContent = carico.num_scarico;
-  document.getElementById('report-content').textContent = currentReportText;
-  document.getElementById('modal-report').classList.add('open');
+// ============================================================
+// IMPOSTAZIONI
+// ============================================================
+async function salvaSoglia(){
+  const v=parseInt(document.getElementById('soglia-input').value);
+  if(isNaN(v)||v<0){showToast('Valore non valido');return;}
+  DATA.soglia=v;await saveToDrive();showToast('Soglia aggiornata: '+v.toLocaleString('it-IT')+' lt ✓');
 }
-
-function generaReportById(id) {
-  const c = DATA.carichi.find(x => x.id === id);
-  if (c) generaReport(c);
-}
-
-function esportaUltimoCarico() {
-  if (DATA.carichi.length === 0) { showToast('Nessun carico salvato'); return; }
-  generaReport(DATA.carichi[DATA.carichi.length - 1]);
-}
-
-function copyReport() {
-  navigator.clipboard.writeText(currentReportText).then(() => showToast('Copiato!'));
-}
-
-function downloadReport() {
-  const blob = new Blob([currentReportText], { type: 'text/plain;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'scarico_' + (document.getElementById('report-num').textContent) + '_' + new Date().toISOString().slice(0,10) + '.txt';
-  a.click();
+function esportaBackupLocale(){
+  const b=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download='distributore_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();
+  showToast('Backup esportato ✓');
 }
 
 // ============================================================
 // UTILS
 // ============================================================
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 2500);
-}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2500);}
+document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
 
-// Close modals on overlay click
-document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
-});
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/distributore/sw.js').catch(e=>console.log('SW:',e));});}
 
-// Init
-renderDashboard();
-const now = new Date();
-document.getElementById('ct-data').value = now.toISOString().slice(0,10);
-document.getElementById('ct-ora').value = now.toTimeString().slice(0,5);
+const _n=new Date();
+document.getElementById('ct-data').value=_n.toISOString().slice(0,10);
+document.getElementById('ct-ora').value=_n.toTimeString().slice(0,5);
 </script>
+
+<script src="https://accounts.google.com/gsi/client" onload="onGoogleLoad()" async defer></script>
 </body>
 </html>
