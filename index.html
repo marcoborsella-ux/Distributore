@@ -6,17 +6,16 @@
 <title>Distributore – Gestione Carburanti</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f0f0f">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Distributore">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0f0f0f;--bg2:#181818;--bg3:#222;--border:#2e2e2e;--border2:#3a3a3a;--text:#e8e8e8;--muted:#888;--diesel:#e8a020;--verde:#3db87a;--danger:#e05252;--info:#4a9ede;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--r:6px;--rl:10px;}
+:root{--bg:#0f0f0f;--bg2:#181818;--bg3:#222;--border:#2e2e2e;--border2:#3a3a3a;--text:#e8e8e8;--muted:#888;--diesel:#e8a020;--verde:#3db87a;--danger:#e05252;--info:#4a9ede;--warn:#e8a020;--mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--r:6px;--rl:10px;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100vh;}
-
-/* NAV */
 nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;position:sticky;top:0;z-index:100;overflow-x:auto;}
 .nav-brand{font-family:var(--mono);font-size:13px;color:var(--diesel);padding:1rem 1.5rem 1rem 0;border-right:1px solid var(--border);margin-right:1rem;letter-spacing:.05em;white-space:nowrap;}
 .nav-tabs{display:flex;}
@@ -32,8 +31,6 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1.5rem
 .ddot.err{background:var(--danger);}
 .ddot.spin{background:var(--diesel);animation:pulse 1s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-
-/* LAYOUT */
 .page{display:none;padding:1.25rem;max-width:1100px;margin:0 auto;}
 .page.active{display:block;}
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;margin-bottom:1rem;}
@@ -42,8 +39,6 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1.5rem
 .g2{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
 @media(max-width:700px){.g3,.g4{grid-template-columns:1fr;}.g2{grid-template-columns:1fr;}}
-
-/* CISTERNE */
 .cc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1.25rem;position:relative;overflow:hidden;}
 .cc.d{border-top:3px solid var(--diesel);}
 .cc.v{border-top:3px solid var(--verde);}
@@ -63,20 +58,18 @@ nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 1.5rem
 .cc-b.al{background:var(--danger);}
 .cc-ft{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--muted);font-family:var(--mono);}
 .badge-al{position:absolute;top:12px;right:12px;background:var(--danger);color:#fff;font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:20px;}
-
-/* POMPE */
 .pc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:1rem;}
 .pc-lbl{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
 .pc-num{font-family:var(--mono);font-size:22px;font-weight:600;margin:4px 0;}
 .pc-num.d{color:var(--diesel);}
 .pc-num.v{color:var(--verde);}
 .pc-sub{font-family:var(--mono);font-size:11px;color:var(--muted);}
-
-/* FORM */
 .fg{margin-bottom:1rem;}
 label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-family:var(--mono);}
 input,select,textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:14px;padding:8px 10px;transition:border .15s;}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--diesel);}
+input.warn-input{border-color:var(--warn);}
+input.err-input{border-color:var(--danger);}
 select option{background:var(--bg3);}
 textarea{resize:vertical;min-height:70px;}
 .btn{display:inline-flex;align-items:center;gap:6px;background:var(--diesel);color:#000;border:none;border-radius:var(--r);padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:opacity .15s;font-family:var(--sans);white-space:nowrap;}
@@ -87,8 +80,9 @@ textarea{resize:vertical;min-height:70px;}
 .bd{background:var(--danger);color:#fff;}
 .bsm{padding:5px 12px;font-size:12px;}
 .hint{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--mono);}
-
-/* TABLE */
+.hint.ok{color:var(--verde);}
+.hint.warn{color:var(--warn);}
+.hint.err{color:var(--danger);}
 table{width:100%;border-collapse:collapse;font-size:13px;}
 th{text-align:left;padding:8px 10px;font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border);}
 td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
@@ -96,19 +90,18 @@ tr:last-child td{border-bottom:none;}
 tr:hover td{background:rgba(255,255,255,.02);}
 .tag{display:inline-block;font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:20px;}
 .tc{background:rgba(74,158,222,.12);color:var(--info);}
+.tm{background:rgba(136,136,136,.12);color:var(--muted);}
 .mono{font-family:var(--mono);}
-
-/* MISC */
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px;}
 .st{font-family:var(--mono);font-size:13px;color:var(--text);}
 .ss{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px;}
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:1rem;}
 .mo.open{display:flex;}
-.mb{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:1.5rem;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;}
+.mb{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:1.5rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
 .mt{font-family:var(--mono);font-size:13px;margin-bottom:1.25rem;color:var(--diesel);}
 .mf{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;flex-wrap:wrap;}
 .cr{background:var(--bg3);border-radius:var(--r);padding:10px 14px;font-family:var(--mono);font-size:24px;font-weight:600;color:var(--diesel);margin-top:8px;text-align:center;}
-#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 16px;font-size:13px;z-index:999;display:none;font-family:var(--mono);max-width:280px;}
+#toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 16px;font-size:13px;z-index:999;display:none;font-family:var(--mono);max-width:300px;}
 .fd{border:1px dashed var(--border2);border-radius:var(--r);padding:1rem;text-align:center;cursor:pointer;transition:border .15s;}
 .fd:hover{border-color:var(--diesel);}
 .fl{margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;}
@@ -119,38 +112,46 @@ tr:hover td{background:rgba(255,255,255,.02);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 .fb{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1rem;}
 .fb input,.fb select{width:auto;flex:1;min-width:120px;}
-.div{border:none;border-top:1px solid var(--border);margin:1rem 0;}
+.hdiv{border:none;border-top:1px solid var(--border);margin:1rem 0;}
 .gi{background:var(--bg3);border-radius:var(--r);padding:10px 12px;margin-bottom:1rem;font-size:12px;color:var(--muted);font-family:var(--mono);}
 .gi .vd{color:var(--verde);}
 .gi .ds{color:var(--diesel);}
+.das-qty{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:12px;margin-bottom:1rem;}
+.das-qty-title{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.das-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.das-row:last-child{margin-bottom:0;}
+.das-row label{margin:0;min-width:120px;font-size:11px;}
+.das-row input{flex:1;}
+.das-check{font-family:var(--mono);font-size:11px;margin-top:8px;padding:8px;border-radius:var(--r);}
+.das-check.ok{background:rgba(61,184,122,.1);color:var(--verde);}
+.das-check.warn{background:rgba(232,160,32,.1);color:var(--warn);}
+.das-check.err{background:rgba(224,82,82,.1);color:var(--danger);}
+.empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-family:var(--mono);font-size:13px;}
+.empty-icon{font-size:40px;margin-bottom:1rem;}
+.loading{text-align:center;padding:4rem;color:var(--muted);font-family:var(--mono);font-size:13px;}
 
 /* LOGIN */
 #ls{position:fixed;inset:0;background:var(--bg);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem;}
 #ls.hidden{display:none;}
 .ll{font-family:var(--mono);font-size:32px;color:var(--diesel);letter-spacing:.1em;}
-.lsub{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;}
+.lsub{font-family:var(--mono);font-size:12px;color:var(--muted);}
 .lc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:2rem;width:100%;max-width:340px;text-align:center;}
-.lt{font-family:var(--mono);font-size:13px;margin-bottom:.5rem;}
+.lt2{font-family:var(--mono);font-size:13px;margin-bottom:.5rem;}
 .ld{font-size:12px;color:var(--muted);margin-bottom:1.5rem;line-height:1.6;}
 .gbtn{background:#fff;color:#333;border:1px solid #ddd;display:inline-flex;align-items:center;gap:10px;padding:10px 20px;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;transition:box-shadow .15s;font-family:var(--sans);}
 .gbtn:hover{box-shadow:0 2px 8px rgba(0,0,0,.3);}
 .gbtn svg{width:18px;height:18px;flex-shrink:0;}
-
-/* EMPTY STATE */
-.empty{text-align:center;padding:3rem 1rem;color:var(--muted);font-family:var(--mono);font-size:13px;}
-.empty-icon{font-size:40px;margin-bottom:1rem;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="ls">
   <div class="ll">⛽ DISTRIBUTORE</div>
-  <div class="lsub">Gestione Carburanti · ALA Carburanti S.R.L.</div>
+  <div class="lsub">ALA Carburanti S.R.L. – Castelfidardo</div>
   <div class="lc">
-    <div class="lt">Accedi con Google</div>
-    <div class="ld">I dati vengono salvati e sincronizzati sul tuo Google Drive personale. Accessibili da qualsiasi dispositivo.</div>
-    <button class="gbtn" onclick="handleLogin()">
+    <div class="lt2">Accedi con Google</div>
+    <div class="ld">I dati vengono sincronizzati automaticamente su tutti i tuoi dispositivi.</div>
+    <button class="gbtn" onclick="login()">
       <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Accedi con Google
     </button>
@@ -169,7 +170,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
   </div>
   <div class="nav-spacer"></div>
   <div class="nav-right">
-    <div class="dsync"><div class="ddot" id="ddot"></div><span id="dlbl" style="color:var(--muted)">Drive</span></div>
+    <div class="dsync"><div class="ddot" id="ddot"></div><span id="dlbl" style="color:var(--muted)">Firebase</span></div>
     <div class="nav-date" id="clock"></div>
   </div>
 </nav>
@@ -192,7 +193,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
     <div class="pc"><div class="pc-lbl">Pompa 3 · Gasolio</div><div class="pc-num d" id="p3t">—</div><div class="pc-sub">totalizzatore</div></div>
     <div class="pc"><div class="pc-lbl">Pompa 4 · Gasolio</div><div class="pc-num d" id="p4t">—</div><div class="pc-sub">totalizzatore</div></div>
   </div>
-  <div class="card"><div class="card-title">Ultimi Movimenti</div><div style="overflow-x:auto"><table><thead><tr><th>Data/Ora</th><th>Tipo</th><th>Riferimento</th><th>C1</th><th>C2</th><th>C3</th></tr></thead><tbody id="dash-tb"></tbody></table></div></div>
+  <div class="card"><div class="card-title">Ultimi Movimenti</div><div style="overflow-x:auto"><table><thead><tr><th>Data/Ora</th><th>Tipo</th><th>Riferimento</th><th>C1 Gas.P</th><th>C2 Verde</th><th>C3 Gas.G</th></tr></thead><tbody id="dash-tb"></tbody></table></div></div>
 </div>
 
 <!-- NUOVO CARICO -->
@@ -204,44 +205,71 @@ tr:hover td{background:rgba(255,255,255,.02);}
         <div class="card-title">Dati DAS / Bolla</div>
         <div class="fg"><label>Numero Scarico (progressivo anno)</label><input type="number" id="cn" placeholder="es. 1" min="1"></div>
         <div class="fg"><label>Numero DAS</label><input type="text" id="cdas" placeholder="es. 26IT5452726ANO00001O9"></div>
-        <div class="g2" style="gap:8px"><div class="fg"><label>Data</label><input type="date" id="cdt"></div><div class="fg"><label>Ora</label><input type="time" id="cor"></div></div>
+        <div class="g2" style="gap:8px">
+          <div class="fg"><label>Data</label><input type="date" id="cdt"></div>
+          <div class="fg"><label>Ora</label><input type="time" id="cor"></div>
+        </div>
         <div class="fg"><label>Fornitore</label><input type="text" id="cfo" placeholder="es. Italiana Petroli / API Ancona"></div>
         <div class="fg"><label>Trasportatore</label><input type="text" id="ctr" placeholder="es. Transadriatico"></div>
         <div class="fg"><label>Autista</label><input type="text" id="cau" placeholder="es. Tessuto Raffaele Fabio"></div>
         <div class="fg"><label>Targa Mezzo</label><input type="text" id="cta" placeholder="es. EZ050FR / XA624NT"></div>
         <div class="fg"><label>Note</label><textarea id="cno" placeholder="Note aggiuntive..."></textarea></div>
+
+        <!-- QUANTITÀ DAS -->
+        <div class="das-qty">
+          <div class="das-qty-title">Quantità da DAS</div>
+          <div class="das-row">
+            <label>Benzina (Verde C2)</label>
+            <input type="number" id="das-benzina" placeholder="litri" min="0" oninput="checkDasQty()">
+          </div>
+          <div class="das-row">
+            <label>Gasolio (C1 + C3)</label>
+            <input type="number" id="das-gasolio" placeholder="litri" min="0" oninput="checkDasQty()">
+          </div>
+          <div class="das-check" id="das-check" style="display:none"></div>
+        </div>
       </div>
+
       <div class="card">
         <div class="card-title">Foto DAS / Documenti</div>
-        <div class="fd" onclick="document.getElementById('dfi').click()"><div style="font-size:24px;margin-bottom:4px">📎</div><div style="font-size:12px;color:var(--muted)">Tocca per allegare foto DAS</div><input type="file" id="dfi" accept="image/*" multiple onchange="handleFiles(this.files)"></div>
+        <div class="fd" onclick="document.getElementById('dfi').click()">
+          <div style="font-size:24px;margin-bottom:4px">📎</div>
+          <div style="font-size:12px;color:var(--muted)">Tocca per allegare foto DAS</div>
+          <input type="file" id="dfi" accept="image/*" multiple onchange="handleFiles(this.files)">
+        </div>
         <div class="fl" id="flist"></div>
+        <div id="upload-progress" style="display:none;margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--muted)"></div>
       </div>
     </div>
+
     <div>
       <div class="card">
         <div class="card-title">Cisterna 1 – Gasolio Piccola (Pompa 3)</div>
         <div class="gi">Giacenza attuale: <span class="ds" id="g1">—</span></div>
-        <div class="fg"><label>CM prima del carico</label><input type="number" id="c1pre" placeholder="cm" min="0" max="126" oninput="updLC(1,'pre')"><div class="hint" id="h1pre">→ — litri</div></div>
-        <div class="fg"><label>Litri caricati (da DAS)</label><input type="number" id="c1lt" placeholder="0" min="0"></div>
+        <div class="fg"><label>CM prima del carico</label><input type="number" id="c1pre" placeholder="cm" min="0" max="126" oninput="updLC(1,'pre');checkDasQty()"><div class="hint" id="h1pre">→ — litri</div></div>
+        <div class="fg"><label>Litri caricati</label><input type="number" id="c1lt" placeholder="0" min="0" oninput="checkDasQty()"></div>
         <div class="fg"><label>CM dopo il carico</label><input type="number" id="c1post" placeholder="cm" min="0" max="126" oninput="updLC(1,'post')"><div class="hint" id="h1post">→ — litri</div></div>
         <div class="fg"><label>Contatore Pompa 3 al carico</label><input type="number" id="cp3" placeholder="lettura contatore"></div>
       </div>
+
       <div class="card">
         <div class="card-title">Cisterna 2 – Verde (Pompe 1/2)</div>
         <div class="gi">Giacenza attuale: <span class="vd" id="g2">—</span></div>
-        <div class="fg"><label>CM prima del carico</label><input type="number" id="c2pre" placeholder="cm" min="0" max="159" oninput="updLC(2,'pre')"><div class="hint" id="h2pre">→ — litri</div></div>
-        <div class="fg"><label>Litri caricati (da DAS)</label><input type="number" id="c2lt" placeholder="0" min="0"></div>
+        <div class="fg"><label>CM prima del carico</label><input type="number" id="c2pre" placeholder="cm" min="0" max="159" oninput="updLC(2,'pre');checkDasQty()"><div class="hint" id="h2pre">→ — litri</div></div>
+        <div class="fg"><label>Litri caricati</label><input type="number" id="c2lt" placeholder="0" min="0" oninput="checkDasQty()"></div>
         <div class="fg"><label>CM dopo il carico</label><input type="number" id="c2post" placeholder="cm" min="0" max="159" oninput="updLC(2,'post')"><div class="hint" id="h2post">→ — litri</div></div>
         <div class="fg"><label>Contatori Pompa 1 + Pompa 2 al carico</label><div class="g2" style="gap:8px"><input type="number" id="cp1" placeholder="Pompa 1"><input type="number" id="cp2" placeholder="Pompa 2"></div></div>
       </div>
+
       <div class="card">
         <div class="card-title">Cisterna 3 – Gasolio Grande (Pompa 4)</div>
         <div class="gi">Giacenza attuale: <span class="ds" id="g3">—</span></div>
-        <div class="fg"><label>CM prima del carico</label><input type="number" id="c3pre" placeholder="cm" min="0" max="159" oninput="updLC(3,'pre')"><div class="hint" id="h3pre">→ — litri</div></div>
-        <div class="fg"><label>Litri caricati (da DAS)</label><input type="number" id="c3lt" placeholder="0" min="0"></div>
+        <div class="fg"><label>CM prima del carico</label><input type="number" id="c3pre" placeholder="cm" min="0" max="159" oninput="updLC(3,'pre');checkDasQty()"><div class="hint" id="h3pre">→ — litri</div></div>
+        <div class="fg"><label>Litri caricati</label><input type="number" id="c3lt" placeholder="0" min="0" oninput="checkDasQty()"></div>
         <div class="fg"><label>CM dopo il carico</label><input type="number" id="c3post" placeholder="cm" min="0" max="159" oninput="updLC(3,'post')"><div class="hint" id="h3post">→ — litri</div></div>
         <div class="fg"><label>Contatore Pompa 4 al carico</label><input type="number" id="cp4" placeholder="lettura contatore"></div>
       </div>
+
       <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
         <button class="btn bg" onclick="clearCarico()">Annulla</button>
         <button class="btn" onclick="salvaCarico()">💾 Salva Carico</button>
@@ -268,7 +296,8 @@ tr:hover td{background:rgba(255,255,255,.02);}
   <div class="card">
     <div class="card-title">Storico Contatori</div>
     <div class="fb">
-      <input type="date" id="ctfd"><input type="date" id="ctfa">
+      <input type="date" id="ctfd" placeholder="Da">
+      <input type="date" id="ctfa" placeholder="A">
       <button class="btn bg bsm" onclick="renderCont()">Filtra</button>
       <button class="btn bg bsm" onclick="filtLastCarico()">Da ultimo carico</button>
     </div>
@@ -279,7 +308,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
 <!-- STORICO -->
 <div class="page" id="page-storico">
   <div class="sh"><div class="st">Storico Carichi</div></div>
-  <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Data/Ora</th><th>DAS</th><th>C1</th><th>C2</th><th>C3</th><th>Autista</th><th></th></tr></thead><tbody id="st-tb"></tbody></table></div></div>
+  <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Data/Ora</th><th>DAS</th><th>Benz.DAS</th><th>Gas.DAS</th><th>C1</th><th>C2</th><th>C3</th><th>Autista</th><th></th></tr></thead><tbody id="st-tb"></tbody></table></div></div>
 </div>
 
 <!-- CALCOLATORE -->
@@ -295,13 +324,12 @@ tr:hover td{background:rgba(255,255,255,.02);}
     <div class="card">
       <div class="card-title">Info Cisterne</div>
       <div style="line-height:2;font-size:13px">
-        <div><span style="color:var(--diesel)">■</span> Cisterna 1 – Gasolio Piccola</div>
-        <div style="margin-left:1rem;font-family:var(--mono);font-size:11px;color:var(--muted)">Cap. 6.200 lt · Ø 1.270 m · L 5.000 m · 1–126 cm</div>
-        <div style="margin-top:8px"><span style="color:var(--verde)">■</span> Cisterna 2 – Verde</div>
-        <div style="margin-left:1rem;font-family:var(--mono);font-size:11px;color:var(--muted)">Cap. 12.600 lt · Ø 1.600 m · L 6.200 m · 1–159 cm</div>
-        <div style="margin-top:8px"><span style="color:var(--diesel)">■</span> Cisterna 3 – Gasolio Grande</div>
-        <div style="margin-left:1rem;font-family:var(--mono);font-size:11px;color:var(--muted)">Cap. 12.600 lt · Ø 1.600 m · L 6.200 m · 1–159 cm</div>
-        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px"><span style="color:var(--danger)">⚠</span> Soglia allarme: <span id="sdsp">1.800</span> litri</div>
+        <div><span style="color:var(--diesel)">■</span> Cisterna 1 – Gasolio Piccola · 1–126 cm · max 6.440 lt</div>
+        <div><span style="color:var(--verde)">■</span> Cisterna 2 – Verde · 1–159 cm · max 12.751 lt</div>
+        <div><span style="color:var(--diesel)">■</span> Cisterna 3 – Gasolio Grande · 1–159 cm · max 12.751 lt</div>
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);font-family:var(--mono);font-size:12px">
+          <span style="color:var(--danger)">⚠</span> Soglia allarme: <span id="sdsp">1.800</span> litri
+        </div>
       </div>
     </div>
   </div>
@@ -312,7 +340,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
   <div class="sh"><div class="st">Impostazioni</div></div>
   <div class="g2">
     <div class="card">
-      <div class="card-title">Account Google Drive</div>
+      <div class="card-title">Account</div>
       <div id="acc-info" style="font-size:13px;color:var(--muted);margin-bottom:1rem;font-family:var(--mono)">—</div>
       <button class="btn bd bsm" onclick="logout()">Disconnetti</button>
     </div>
@@ -324,7 +352,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
   </div>
   <div class="card">
     <div class="card-title">Backup Locale</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:1rem;line-height:1.6">Esporta una copia locale dei dati come file JSON di riserva.</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1rem;line-height:1.6">Esporta una copia locale di tutti i dati come file JSON.</p>
     <button class="btn bg bsm" onclick="exportJSON()">⬇️ Esporta JSON</button>
   </div>
 </div>
@@ -333,8 +361,8 @@ tr:hover td{background:rgba(255,255,255,.02);}
 <div class="mo" id="mo-misura">
   <div class="mb">
     <div class="mt">📏 Inserisci Misura Cisterne</div>
-    <div class="g2"><div class="fg"><label>Data</label><input type="date" id="md"></div><div class="fg"><label>Ora</label><input type="time" id="mo2"></div></div>
-    <hr class="div">
+    <div class="g2"><div class="fg"><label>Data</label><input type="date" id="md"></div><div class="fg"><label>Ora</label><input type="time" id="mor"></div></div>
+    <hr class="hdiv">
     <div class="fg"><label>Cisterna 1 – Gasolio Piccola (cm)</label><input type="number" id="m1" placeholder="cm" min="0" max="126" oninput="mHint(1)"><div class="hint" id="mh1">→ — litri</div></div>
     <div class="fg"><label>Cisterna 2 – Verde (cm)</label><input type="number" id="m2" placeholder="cm" min="0" max="159" oninput="mHint(2)"><div class="hint" id="mh2">→ — litri</div></div>
     <div class="fg"><label>Cisterna 3 – Gasolio Grande (cm)</label><input type="number" id="m3" placeholder="cm" min="0" max="159" oninput="mHint(3)"><div class="hint" id="mh3">→ — litri</div></div>
@@ -344,7 +372,7 @@ tr:hover td{background:rgba(255,255,255,.02);}
 
 <!-- MODAL REPORT -->
 <div class="mo" id="mo-rpt">
-  <div class="mb" style="max-width:640px">
+  <div class="mb" style="max-width:660px">
     <div class="mt">📄 Report Carico – Scarico #<span id="rpt-num">—</span></div>
     <div id="rpt-body" style="font-family:var(--mono);font-size:12px;line-height:1.8;white-space:pre-wrap;background:var(--bg3);border-radius:var(--r);padding:1rem;color:var(--text);max-height:55vh;overflow-y:auto"></div>
     <div class="mf"><button class="btn bg" onclick="closeM('mo-rpt')">Chiudi</button><button class="btn bg" onclick="copyRpt()">📋 Copia</button><button class="btn" onclick="dlRpt()">⬇️ Scarica TXT</button></div>
@@ -353,156 +381,105 @@ tr:hover td{background:rgba(255,255,255,.02);}
 
 <div id="toast"></div>
 
-<script>
-// ─── CONFIG ───────────────────────────────────────────────
-const CLIENT_ID='352288408553-oi4ptscd5pt1p0ikvfhpmpdihb1fuiov.apps.googleusercontent.com';
-const SCOPES='https://www.googleapis.com/auth/drive.file';
-const FNAME='distributore_data.json';
-const FOLDER='Distributore App';
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-// ─── TABELLE TARATURA ─────────────────────────────────────
+// ── FIREBASE CONFIG ────────────────────────────────────────
+const app = initializeApp({
+  apiKey: "AIzaSyDEmaKJlefPeAXvqNk1LJhtWysBDb0x3zg",
+  authDomain: "distributore-c88ce.firebaseapp.com",
+  databaseURL: "https://distributore-c88ce-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "distributore-c88ce",
+  appId: "1:482234735188:web:e1199d8ec38580ac9cebc1"
+});
+const auth = getAuth(app);
+const db = getDatabase(app);
+let dbRef = null;
+
+// ── TABELLE TARATURA ──────────────────────────────────────
 const T1={1:10,2:27,3:46,4:69,5:94,6:121,7:151,8:183,9:215,10:250,11:287,12:325,13:364,14:404,15:446,16:488,17:533,18:578,19:624,20:672,21:719,22:768,23:818,24:869,25:920,26:972,27:1025,28:1079,29:1133,30:1188,31:1244,32:1299,33:1357,34:1413,35:1472,36:1530,37:1589,38:1647,39:1707,40:1768,41:1828,42:1889,43:1950,44:2011,45:2073,46:2135,47:2198,48:2261,49:2324,50:2386,51:2450,52:2513,53:2577,54:2641,55:2705,56:2769,57:2834,58:2898,59:2963,60:3027,61:3092,62:3157,63:3221,64:3286,65:3350,66:3415,67:3480,68:3544,69:3609,70:3673,71:3737,72:3801,73:3865,74:3929,75:3993,76:4056,77:4119,78:4183,79:4244,80:4307,81:4369,82:4431,83:4493,84:4554,85:4615,86:4675,87:4735,88:4795,89:4855,90:4913,91:4972,92:5029,93:5087,94:5143,95:5199,96:5255,97:5310,98:5364,99:5417,100:5470,101:5522,102:5575,103:5624,104:5674,105:5723,106:5772,107:5818,108:5865,109:5909,110:5954,111:5997,112:6038,113:6079,114:6119,115:6156,116:6192,117:6227,118:6261,119:6292,120:6321,121:6348,122:6373,123:6396,124:6416,125:6432,126:6440};
 const T23={1:15,2:37,3:65,4:96,5:132,6:171,7:213,8:257,9:303,10:352,11:403,12:457,13:513,14:570,15:629,16:690,17:753,18:817,19:883,20:954,21:1018,22:1088,23:1159,24:1232,25:1306,26:1381,27:1457,28:1534,29:1612,30:1692,31:1771,32:1853,33:1935,34:2018,35:2102,36:2186,37:2272,38:2359,39:2446,40:2534,41:2623,42:2712,43:2801,44:2892,45:2984,46:3076,47:3169,48:3261,49:3355,50:3449,51:3544,52:3639,53:3735,54:3831,55:3927,56:4029,57:4121,58:4218,59:4316,60:4415,61:4513,62:4612,63:4712,64:4811,65:4911,66:5011,67:5111,68:5212,69:5312,70:5413,71:5514,72:5615,73:5716,74:5817,75:5919,76:6020,77:6121,78:6223,79:6324,80:6426,81:6528,82:6628,83:6730,84:6891,85:6932,86:7034,87:7135,88:7236,89:7337,90:7437,91:7538,92:7638,93:7739,94:7839,95:7938,96:8038,97:8137,98:8236,99:8335,100:8433,101:8531,102:8629,103:8726,104:8823,105:8919,106:9015,107:9111,108:9206,109:9301,110:9395,111:9489,112:9581,113:9674,114:9766,115:9857,116:9948,117:10037,118:10127,119:10216,120:10304,121:10390,122:10477,123:10563,124:10647,125:10732,126:10815,127:10897,128:10978,129:11058,130:11138,131:11215,132:11293,133:11368,134:11444,135:11517,136:11590,137:11661,138:11732,139:11800,140:11867,141:11932,142:11997,143:12059,144:12120,145:12179,146:12236,147:12299,148:12346,149:12398,150:12447,151:12493,152:12537,153:12579,154:12617,155:12653,156:12684,157:12712,158:12734,159:12751};
 const MLT={1:6440,2:12751,3:12751};
 
-function cmL(c,cm){
+window.cmL=function(c,cm){
   const t=c===1?T1:T23,v=Math.round(cm);
   if(v<=0)return 0;if(t[v])return t[v];
   const mx=c===1?126:159;if(v>=mx)return MLT[c];
   const lo=Math.floor(v),hi=Math.ceil(v);
   if(t[lo]&&t[hi])return Math.round(t[lo]+(t[hi]-t[lo])*(v-lo)/(hi-lo));
   return null;
-}
+};
 
-// ─── DATA ─────────────────────────────────────────────────
+// ── DATA ──────────────────────────────────────────────────
 function emptyData(){
-  return{
-    soglia:1800,
-    cisterne:{1:{cm:null,litri:null},2:{cm:null,litri:null},3:{cm:null,litri:null}},
-    contatori:{p1:null,p2:null,p3:null,p4:null},
-    carichi:[],misure:[],letture_contatori:[]
-  };
+  return{soglia:1800,cisterne:{1:{cm:null,litri:null},2:{cm:null,litri:null},3:{cm:null,litri:null}},contatori:{p1:null,p2:null,p3:null,p4:null},carichi:[],misure:[],letture_contatori:[]};
 }
 let DATA=emptyData();
 
-// ─── DRIVE ────────────────────────────────────────────────
-let tokenClient,token=null,fileId=null,folderId=null;
-
+// ── STATUS ────────────────────────────────────────────────
 function dSt(s,lbl){
   document.getElementById('ddot').className='ddot '+(s||'');
   const el=document.getElementById('dlbl');
-  el.textContent=lbl||'Drive';
+  el.textContent=lbl||'Firebase';
   el.style.color=s==='ok'?'var(--verde)':s==='err'?'var(--danger)':'var(--muted)';
 }
 
-function handleLogin(){tokenClient.requestAccessToken({prompt:'consent'});}
-
-function logout(){
-  if(!confirm('Disconnettersi da Google?'))return;
-  google.accounts.oauth2.revoke(token,()=>{
-    token=null;fileId=null;folderId=null;
-    localStorage.removeItem('dist_tk');
-    document.getElementById('ls').classList.remove('hidden');
-    dSt('','Drive');
-  });
-}
-
-async function onGoogleLoad(){
-  tokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:CLIENT_ID,scope:SCOPES,
-    callback:async r=>{
-      if(r.error){dSt('err','Errore');return;}
-      token=r.access_token;
-      localStorage.setItem('dist_tk',token);
-      await afterLogin();
-    }
-  });
-  const saved=localStorage.getItem('dist_tk');
-  if(saved){
-    token=saved;dSt('spin','Connetto...');
-    try{await afterLogin();return;}
-    catch(e){token=null;localStorage.removeItem('dist_tk');}
-  }
-  document.getElementById('ls').classList.remove('hidden');
-}
-
-async function afterLogin(){
-  dSt('spin','Carico...');
+// ── AUTH ──────────────────────────────────────────────────
+window.login=async function(){
   try{
-    await findOrCreateFolder();
-    await loadDrive();
+    const provider=new GoogleAuthProvider();
+    await signInWithPopup(auth,provider);
+  }catch(e){showToast('Errore login: '+e.message);}
+};
+
+window.logout=async function(){
+  if(!confirm('Disconnettersi?'))return;
+  await signOut(auth);
+  document.getElementById('ls').classList.remove('hidden');
+  dSt('','Firebase');
+  DATA=emptyData();
+};
+
+onAuthStateChanged(auth,user=>{
+  if(user){
     document.getElementById('ls').classList.add('hidden');
-    renderDash();
-    updAccInfo();
-    dSt('ok','Drive ✓');
-  }catch(e){
-    console.error(e);
-    dSt('err','Errore Drive');
-    showToast('Errore Drive: '+e.message);
+    document.getElementById('acc-info').textContent=user.email;
+    dbRef=ref(db,'users/'+user.uid+'/data');
+    dSt('spin','Carico...');
+    // Realtime listener — si aggiorna automaticamente su tutti i dispositivi
+    onValue(dbRef,snap=>{
+      if(snap.exists()){
+        DATA=snap.val();
+        if(!DATA.cisterne)DATA.cisterne={1:{cm:null,litri:null},2:{cm:null,litri:null},3:{cm:null,litri:null}};
+        if(!DATA.contatori)DATA.contatori={p1:null,p2:null,p3:null,p4:null};
+        if(!DATA.carichi)DATA.carichi=[];
+        if(!DATA.misure)DATA.misure=[];
+        if(!DATA.letture_contatori)DATA.letture_contatori=[];
+      }else{
+        DATA=emptyData();
+      }
+      dSt('ok','Firebase ✓');
+      renderDash();
+    },err=>{dSt('err','Errore');showToast('Errore Firebase: '+err.message);});
+  }else{
     document.getElementById('ls').classList.remove('hidden');
-    token=null;localStorage.removeItem('dist_tk');
   }
-}
+});
 
-async function gFetch(url,opts={}){
-  opts.headers={...opts.headers,Authorization:'Bearer '+token};
-  const r=await fetch(url,opts);
-  if(r.status===401){token=null;localStorage.removeItem('dist_tk');throw new Error('Token scaduto');}
-  return r;
-}
-
-async function findOrCreateFolder(){
-  const r=await gFetch(`https://www.googleapis.com/drive/v3/files?q=name='${FOLDER}'+and+mimeType='application/vnd.google-apps.folder'+and+trashed=false&fields=files(id)`);
-  const d=await r.json();
-  if(d.files&&d.files.length>0){folderId=d.files[0].id;return;}
-  const cr=await gFetch('https://www.googleapis.com/drive/v3/files',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name:FOLDER,mimeType:'application/vnd.google-apps.folder'})
-  });
-  const f=await cr.json();folderId=f.id;
-}
-
-async function findOrCreateFile(){
-  const r=await gFetch(`https://www.googleapis.com/drive/v3/files?q=name='${FNAME}'+and+'${folderId}'+in+parents+and+trashed=false&fields=files(id)`);
-  const d=await r.json();
-  if(d.files&&d.files.length>0){fileId=d.files[0].id;return false;}
-  const cr=await gFetch('https://www.googleapis.com/drive/v3/files',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({name:FNAME,parents:[folderId],mimeType:'application/json'})
-  });
-  const f=await cr.json();fileId=f.id;return true;
-}
-
-async function loadDrive(){
-  const isNew=await findOrCreateFile();
-  if(isNew){DATA=emptyData();return;}
-  const r=await gFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
-  if(r.ok){
-    const txt=await r.text();
-    if(txt&&txt.trim()){try{DATA=JSON.parse(txt);}catch(e){DATA=emptyData();}}
-  }
-}
-
-async function saveDrive(){
-  if(!token){showToast('Non connesso a Drive');return;}
+// ── SAVE ──────────────────────────────────────────────────
+async function save(){
+  if(!dbRef){showToast('Non connesso');return;}
   dSt('spin','Salvo...');
   try{
-    if(!fileId)await findOrCreateFile();
-    await gFetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,{
-      method:'PATCH',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(DATA)
-    });
-    dSt('ok','Drive ✓');
-  }catch(e){dSt('err','Errore salvataggio');showToast('Errore Drive');}
+    await set(dbRef,JSON.parse(JSON.stringify(DATA)));
+    dSt('ok','Firebase ✓');
+  }catch(e){dSt('err','Errore salvataggio');showToast('Errore: '+e.message);}
 }
 
-function updAccInfo(){
-  fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+token}})
-    .then(r=>r.json()).then(u=>{const el=document.getElementById('acc-info');if(el)el.textContent=u.email||'Connesso';}).catch(()=>{});
-}
-
-// ─── NAVIGATION ───────────────────────────────────────────
-function showPage(id){
+// ── NAVIGATION ────────────────────────────────────────────
+window.showPage=function(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
@@ -513,17 +490,16 @@ function showPage(id){
   if(id==='contatori')renderCont();
   if(id==='carico')initCarico();
   if(id==='imp'){document.getElementById('s-inp').value=DATA.soglia||1800;}
-}
+};
 
 function clock(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleDateString('it-IT')+' '+n.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});}
 setInterval(clock,1000);clock();
 
-// ─── DASHBOARD ────────────────────────────────────────────
+// ── DASHBOARD ─────────────────────────────────────────────
 function renderDash(){
   const soglia=DATA.soglia||1800;
   [1,2,3].forEach(i=>{
-    const c=DATA.cisterne[i];
-    const lt=c.litri,max=MLT[i];
+    const c=DATA.cisterne[i],lt=c.litri,max=MLT[i];
     const tipo=i===2?'v':'d',isAlert=lt!==null&&lt<soglia;
     const card=document.getElementById('cc'+i);
     card.classList.toggle('al',isAlert);
@@ -543,88 +519,138 @@ function renderDash(){
     const v=DATA.contatori[p];
     document.getElementById(p+'t').textContent=v!==null?v.toLocaleString('it-IT'):'—';
   });
-
   const evs=[];
-  DATA.carichi.forEach(c=>evs.push({dt:c.data+'T'+c.ora,tipo:'carico',ref:'#'+c.num_scarico+(c.das?' · '+c.das:''),c1:'+'+c.c1.litri_caricati+' lt',c2:'+'+c.c2.litri_caricati+' lt',c3:'+'+c.c3.litri_caricati+' lt'}));
-  DATA.misure.forEach(m=>evs.push({dt:m.data+'T'+m.ora,tipo:'misura',ref:'Misura manuale',c1:m.c1?(m.c1+'cm'):' —',c2:m.c2?(m.c2+'cm'):'—',c3:m.c3?(m.c3+'cm'):'—'}));
+  (DATA.carichi||[]).forEach(c=>evs.push({dt:c.data+'T'+c.ora,tipo:'carico',ref:'#'+c.num_scarico+(c.das?' · '+c.das:''),c1:'+'+c.c1.litri_caricati+' lt',c2:'+'+c.c2.litri_caricati+' lt',c3:'+'+c.c3.litri_caricati+' lt'}));
+  (DATA.misure||[]).forEach(m=>evs.push({dt:m.data+'T'+m.ora,tipo:'misura',ref:'Misura manuale',c1:m.c1?(m.c1+'cm'):'—',c2:m.c2?(m.c2+'cm'):'—',c3:m.c3?(m.c3+'cm'):'—'}));
   evs.sort((a,b)=>b.dt.localeCompare(a.dt));
-
   const tb=document.getElementById('dash-tb');tb.innerHTML='';
-  if(evs.length===0){
-    tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">📋</div>Nessun movimento registrato</div></td></tr>';
-  } else {
-    evs.slice(0,10).forEach(e=>{
-      const tr=document.createElement('tr');
-      const tag=e.tipo==='carico'?'<span class="tag tc">carico</span>':'<span class="tag" style="background:rgba(136,136,136,.12);color:var(--muted)">misura</span>';
-      tr.innerHTML=`<td class="mono" style="font-size:11px">${e.dt.replace('T',' ')}</td><td>${tag}</td><td style="font-size:11px;color:var(--muted)">${e.ref}</td><td class="mono" style="font-size:11px">${e.c1}</td><td class="mono" style="font-size:11px">${e.c2}</td><td class="mono" style="font-size:11px">${e.c3}</td>`;
-      tb.appendChild(tr);
-    });
-  }
-  if(evs.length>0)document.getElementById('last-upd').textContent='Ultimo: '+evs[0].dt.replace('T',' ');
-  else document.getElementById('last-upd').textContent='Nessun movimento';
+  if(evs.length===0){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="empty-icon">📋</div>Nessun movimento registrato</div></td></tr>';}
+  else{evs.slice(0,10).forEach(e=>{const tr=document.createElement('tr');const tag=e.tipo==='carico'?'<span class="tag tc">carico</span>':'<span class="tag tm">misura</span>';tr.innerHTML=`<td class="mono" style="font-size:11px">${e.dt.replace('T',' ')}</td><td>${tag}</td><td style="font-size:11px;color:var(--muted)">${e.ref}</td><td class="mono" style="font-size:11px">${e.c1}</td><td class="mono" style="font-size:11px">${e.c2}</td><td class="mono" style="font-size:11px">${e.c3}</td>`;tb.appendChild(tr);});}
+  document.getElementById('last-upd').textContent=evs.length>0?'Ultimo: '+evs[0].dt.replace('T',' '):'Nessun movimento';
   const sd=document.getElementById('sdsp');if(sd)sd.textContent=(DATA.soglia||1800).toLocaleString('it-IT');
 }
 
-// ─── MISURA ───────────────────────────────────────────────
-function openMisura(){
+// ── MISURA ────────────────────────────────────────────────
+window.openMisura=function(){
   const n=new Date();
   document.getElementById('md').value=n.toISOString().slice(0,10);
-  document.getElementById('mo2').value=n.toTimeString().slice(0,5);
+  document.getElementById('mor').value=n.toTimeString().slice(0,5);
   ['m1','m2','m3'].forEach(id=>document.getElementById(id).value='');
   ['mh1','mh2','mh3'].forEach(id=>document.getElementById(id).textContent='→ — litri');
   document.getElementById('mo-misura').classList.add('open');
-}
-function mHint(n){
+};
+window.mHint=function(n){
   const v=parseInt(document.getElementById('m'+n).value),h=document.getElementById('mh'+n);
   if(!isNaN(v)&&v>0){const lt=cmL(n,v);h.textContent=lt!==null?'→ '+lt.toLocaleString('it-IT')+' litri':'→ fuori range';}
   else h.textContent='→ — litri';
-}
-async function salvaMisura(){
-  const dt=document.getElementById('md').value,or=document.getElementById('mo2').value;
+};
+window.salvaMisura=async function(){
+  const dt=document.getElementById('md').value,or=document.getElementById('mor').value;
   if(!dt||!or){showToast('Inserisci data e ora');return;}
   const v1=document.getElementById('m1').value,v2=document.getElementById('m2').value,v3=document.getElementById('m3').value;
   if(!v1&&!v2&&!v3){showToast('Inserisci almeno una misura');return;}
-  const m={data:dt,ora:or,c1:v1?parseInt(v1):null,c2:v2?parseInt(v2):null,c3:v3?parseInt(v3):null};
-  DATA.misure.push(m);
+  if(!DATA.misure)DATA.misure=[];
+  DATA.misure.push({data:dt,ora:or,c1:v1?parseInt(v1):null,c2:v2?parseInt(v2):null,c3:v3?parseInt(v3):null});
   if(v1)DATA.cisterne[1]={cm:parseInt(v1),litri:cmL(1,parseInt(v1))};
   if(v2)DATA.cisterne[2]={cm:parseInt(v2),litri:cmL(2,parseInt(v2))};
   if(v3)DATA.cisterne[3]={cm:parseInt(v3),litri:cmL(3,parseInt(v3))};
-  await saveDrive();closeM('mo-misura');renderDash();showToast('Misura salvata ✓');
-}
+  await save();closeM('mo-misura');showToast('Misura salvata ✓');
+};
 
-// ─── CARICO ───────────────────────────────────────────────
+// ── DAS QTY CHECK ─────────────────────────────────────────
+window.checkDasQty=function(){
+  const dasBenz=parseInt(document.getElementById('das-benzina').value)||0;
+  const dasGas=parseInt(document.getElementById('das-gasolio').value)||0;
+  const c1lt=parseInt(document.getElementById('c1lt').value)||0;
+  const c2lt=parseInt(document.getElementById('c2lt').value)||0;
+  const c3lt=parseInt(document.getElementById('c3lt').value)||0;
+  const gasSum=c1lt+c3lt;
+  const el=document.getElementById('das-check');
+  const msgs=[];
+  if(dasBenz>0||c2lt>0){
+    const diffB=dasBenz-c2lt;
+    if(diffB===0)msgs.push({cls:'ok',txt:'✓ Benzina: DAS '+dasBenz.toLocaleString('it-IT')+' lt = C2 '+c2lt.toLocaleString('it-IT')+' lt'});
+    else if(dasBenz>0&&c2lt>0)msgs.push({cls:'err',txt:'⚠ Benzina: DAS '+dasBenz.toLocaleString('it-IT')+' lt ≠ C2 '+c2lt.toLocaleString('it-IT')+' lt (diff: '+(diffB>0?'+':'')+diffB.toLocaleString('it-IT')+')'});
+  }
+  if(dasGas>0||gasSum>0){
+    const diffG=dasGas-gasSum;
+    if(diffG===0)msgs.push({cls:'ok',txt:'✓ Gasolio: DAS '+dasGas.toLocaleString('it-IT')+' lt = C1+C3 '+gasSum.toLocaleString('it-IT')+' lt'});
+    else if(dasGas>0&&gasSum>0)msgs.push({cls:'err',txt:'⚠ Gasolio: DAS '+dasGas.toLocaleString('it-IT')+' lt ≠ C1+C3 '+gasSum.toLocaleString('it-IT')+' lt (diff: '+(diffG>0?'+':'')+diffG.toLocaleString('it-IT')+')'});
+  }
+  if(msgs.length===0){el.style.display='none';return;}
+  el.style.display='block';
+  el.className='das-check '+(msgs.some(m=>m.cls==='err')?'err':'ok');
+  el.innerHTML=msgs.map(m=>`<div>${m.txt}</div>`).join('');
+};
+
+// ── CARICO ────────────────────────────────────────────────
 function initCarico(){
   const n=new Date();
   document.getElementById('cdt').value=n.toISOString().slice(0,10);
   document.getElementById('cor').value=n.toTimeString().slice(0,5);
-  const next=DATA.carichi.length>0?Math.max(...DATA.carichi.map(c=>c.num_scarico))+1:1;
+  const carichi=DATA.carichi||[];
+  const next=carichi.length>0?Math.max(...carichi.map(c=>c.num_scarico))+1:1;
   document.getElementById('cn').value=next;
   const fmt=c=>c.litri!==null?c.litri.toLocaleString('it-IT')+' lt ('+(c.cm||'—')+' cm)':'non misurata';
   document.getElementById('g1').textContent=fmt(DATA.cisterne[1]);
   document.getElementById('g2').textContent=fmt(DATA.cisterne[2]);
   document.getElementById('g3').textContent=fmt(DATA.cisterne[3]);
 }
-function updLC(n,w){
-  const v=parseInt(document.getElementById('c'+n+(w==='pre'?'pre':'post')).value);
+
+window.updLC=function(n,w){
+  const id='c'+n+(w==='pre'?'pre':'post');
+  const v=parseInt(document.getElementById(id).value);
   const h=document.getElementById('h'+n+(w==='pre'?'pre':'post'));
   if(!isNaN(v)&&v>0){const lt=cmL(n,v);h.textContent=lt!==null?'→ '+lt.toLocaleString('it-IT')+' litri':'→ fuori range';}
   else h.textContent='→ — litri';
-}
+};
 
 let pFiles=[];
-function handleFiles(files){for(const f of files){const r=new FileReader();r.onload=e=>{pFiles.push({name:f.name,data:e.target.result});renderFL();};r.readAsDataURL(f);}}
-function renderFL(){const fl=document.getElementById('flist');fl.innerHTML='';pFiles.forEach((f,i)=>{const c=document.createElement('div');c.className='fc';c.innerHTML=`📎 ${f.name} <button onclick="rmF(${i})">×</button>`;fl.appendChild(c);});}
-function rmF(i){pFiles.splice(i,1);renderFL();}
+window.handleFiles=function(files){
+  for(const f of files){
+    const r=new FileReader();
+    r.onload=e=>{pFiles.push({name:f.name,data:e.target.result,size:f.size});renderFL();};
+    r.readAsDataURL(f);
+  }
+};
+function renderFL(){
+  const fl=document.getElementById('flist');fl.innerHTML='';
+  pFiles.forEach((f,i)=>{
+    const c=document.createElement('div');c.className='fc';
+    const kb=Math.round(f.size/1024);
+    c.innerHTML=`📎 ${f.name} <span style="color:var(--muted)">(${kb}kb)</span> <button onclick="rmF(${i})">×</button>`;
+    fl.appendChild(c);
+  });
+}
+window.rmF=function(i){pFiles.splice(i,1);renderFL();};
 
-async function salvaCarico(){
+window.salvaCarico=async function(){
   const num=parseInt(document.getElementById('cn').value);
   const dt=document.getElementById('cdt').value,or=document.getElementById('cor').value;
   if(!dt||!or||!num){showToast('Inserisci numero scarico, data e ora');return;}
+
+  const dasBenz=parseInt(document.getElementById('das-benzina').value)||0;
+  const dasGas=parseInt(document.getElementById('das-gasolio').value)||0;
+  const c1lt=parseInt(document.getElementById('c1lt').value)||0;
+  const c2lt=parseInt(document.getElementById('c2lt').value)||0;
+  const c3lt=parseInt(document.getElementById('c3lt').value)||0;
+  const gasSum=c1lt+c3lt;
+
+  // Controllo discrepanze DAS
+  const discrepanze=[];
+  if(dasBenz>0&&c2lt>0&&dasBenz!==c2lt) discrepanze.push(`Benzina: DAS ${dasBenz.toLocaleString('it-IT')} lt ≠ C2 ${c2lt.toLocaleString('it-IT')} lt`);
+  if(dasGas>0&&gasSum>0&&dasGas!==gasSum) discrepanze.push(`Gasolio: DAS ${dasGas.toLocaleString('it-IT')} lt ≠ C1+C3 ${gasSum.toLocaleString('it-IT')} lt`);
+
+  if(discrepanze.length>0){
+    const msg=`⚠ Discrepanze rilevate:\n\n${discrepanze.join('\n')}\n\nVuoi salvare comunque?`;
+    if(!confirm(msg))return;
+  }
+
   const gC=id=>{const v=document.getElementById(id).value;return v?parseInt(v):null;};
-  const gL=id=>{const v=document.getElementById(id).value;return v?parseInt(v):0;};
   const c1pr=gC('c1pre'),c1po=gC('c1post');
   const c2pr=gC('c2pre'),c2po=gC('c2post');
   const c3pr=gC('c3pre'),c3po=gC('c3post');
+
   const car={
     id:Date.now(),num_scarico:num,
     das:document.getElementById('cdas').value,data:dt,ora:or,
@@ -633,55 +659,64 @@ async function salvaCarico(){
     autista:document.getElementById('cau').value,
     targa:document.getElementById('cta').value,
     note:document.getElementById('cno').value,
-    c1:{cm_pre:c1pr,litri_pre:c1pr?cmL(1,c1pr):null,litri_caricati:gL('c1lt'),cm_post:c1po,litri_post:c1po?cmL(1,c1po):null},
-    c2:{cm_pre:c2pr,litri_pre:c2pr?cmL(2,c2pr):null,litri_caricati:gL('c2lt'),cm_post:c2po,litri_post:c2po?cmL(2,c2po):null},
-    c3:{cm_pre:c3pr,litri_pre:c3pr?cmL(3,c3pr):null,litri_caricati:gL('c3lt'),cm_post:c3po,litri_post:c3po?cmL(3,c3po):null},
+    das_benzina:dasBenz,das_gasolio:dasGas,
+    c1:{cm_pre:c1pr,litri_pre:c1pr?cmL(1,c1pr):null,litri_caricati:c1lt,cm_post:c1po,litri_post:c1po?cmL(1,c1po):null},
+    c2:{cm_pre:c2pr,litri_pre:c2pr?cmL(2,c2pr):null,litri_caricati:c2lt,cm_post:c2po,litri_post:c2po?cmL(2,c2po):null},
+    c3:{cm_pre:c3pr,litri_pre:c3pr?cmL(3,c3pr):null,litri_caricati:c3lt,cm_post:c3po,litri_post:c3po?cmL(3,c3po):null},
     contatori:{
-      p1:gL('cp1')||DATA.contatori.p1,p2:gL('cp2')||DATA.contatori.p2,
-      p3:gL('cp3')||DATA.contatori.p3,p4:gL('cp4')||DATA.contatori.p4
+      p1:gC('cp1')||DATA.contatori.p1,p2:gC('cp2')||DATA.contatori.p2,
+      p3:gC('cp3')||DATA.contatori.p3,p4:gC('cp4')||DATA.contatori.p4
     },
-    files:[...pFiles]
+    files:pFiles.map(f=>({name:f.name,data:f.data}))
   };
+
   if(c1po)DATA.cisterne[1]={cm:c1po,litri:cmL(1,c1po)};
   if(c2po)DATA.cisterne[2]={cm:c2po,litri:cmL(2,c2po)};
   if(c3po)DATA.cisterne[3]={cm:c3po,litri:cmL(3,c3po)};
   ['p1','p2','p3','p4'].forEach(p=>{if(car.contatori[p])DATA.contatori[p]=car.contatori[p];});
+  if(!DATA.carichi)DATA.carichi=[];
   DATA.carichi.push(car);
-  await saveDrive();
+
+  await save();
   pFiles=[];renderFL();
   showToast('Carico #'+num+' salvato ✓');
   generaRpt(car);
-}
-function clearCarico(){
-  ['cn','cdas','cfo','ctr','cau','cta','cno','c1pre','c1lt','c1post','c2pre','c2lt','c2post','c3pre','c3lt','c3post','cp1','cp2','cp3','cp4'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  pFiles=[];renderFL();
-}
+};
 
-// ─── CONTATORI ────────────────────────────────────────────
-async function salvaCont(){
+window.clearCarico=function(){
+  ['cn','cdas','cfo','ctr','cau','cta','cno','das-benzina','das-gasolio',
+   'c1pre','c1lt','c1post','c2pre','c2lt','c2post','c3pre','c3lt','c3post',
+   'cp1','cp2','cp3','cp4'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('das-check').style.display='none';
+  pFiles=[];renderFL();
+};
+
+// ── CONTATORI ─────────────────────────────────────────────
+window.salvaCont=async function(){
   const dt=document.getElementById('ctd').value,or=document.getElementById('cto').value;
   if(!dt||!or){showToast('Inserisci data e ora');return;}
-  const l={data:dt,ora:or,
-    p1:document.getElementById('ctp1').value?parseInt(document.getElementById('ctp1').value):null,
-    p2:document.getElementById('ctp2').value?parseInt(document.getElementById('ctp2').value):null,
-    p3:document.getElementById('ctp3').value?parseInt(document.getElementById('ctp3').value):null,
-    p4:document.getElementById('ctp4').value?parseInt(document.getElementById('ctp4').value):null};
+  const gV=id=>{const v=document.getElementById(id).value;return v?parseInt(v):null;};
+  const l={data:dt,ora:or,p1:gV('ctp1'),p2:gV('ctp2'),p3:gV('ctp3'),p4:gV('ctp4')};
+  if(!DATA.letture_contatori)DATA.letture_contatori=[];
   DATA.letture_contatori.push(l);
   ['p1','p2','p3','p4'].forEach(p=>{if(l[p]!==null)DATA.contatori[p]=l[p];});
-  await saveDrive();renderCont();showToast('Lettura salvata ✓');
+  await save();renderCont();showToast('Lettura salvata ✓');
   ['ctp1','ctp2','ctp3','ctp4'].forEach(id=>document.getElementById(id).value='');
-}
-function filtLastCarico(){
-  if(DATA.carichi.length===0){showToast('Nessun carico registrato');return;}
-  const last=DATA.carichi.reduce((a,b)=>(a.data+a.ora>b.data+b.ora?a:b));
+};
+
+window.filtLastCarico=function(){
+  const carichi=DATA.carichi||[];
+  if(carichi.length===0){showToast('Nessun carico registrato');return;}
+  const last=carichi.reduce((a,b)=>(a.data+a.ora>b.data+b.ora?a:b));
   document.getElementById('ctfd').value=last.data;
   document.getElementById('ctfa').value='';
   renderCont();
-}
+};
+
 function renderCont(){
   const da=document.getElementById('ctfd').value,a=document.getElementById('ctfa').value;
-  let rows=[...DATA.letture_contatori];
-  DATA.carichi.forEach(c=>{if(c.contatori)rows.push({data:c.data,ora:c.ora,p1:c.contatori.p1,p2:c.contatori.p2,p3:c.contatori.p3,p4:c.contatori.p4,_r:'carico #'+c.num_scarico});});
+  let rows=[...(DATA.letture_contatori||[])];
+  (DATA.carichi||[]).forEach(c=>{if(c.contatori)rows.push({data:c.data,ora:c.ora,p1:c.contatori.p1,p2:c.contatori.p2,p3:c.contatori.p3,p4:c.contatori.p4,_r:'carico #'+c.num_scarico});});
   rows.sort((a,b)=>(a.data+'T'+a.ora).localeCompare(b.data+'T'+b.ora));
   if(da)rows=rows.filter(r=>r.data>=da);
   if(a)rows=rows.filter(r=>r.data<=a);
@@ -697,25 +732,26 @@ function renderCont(){
   });
 }
 
-// ─── STORICO ──────────────────────────────────────────────
+// ── STORICO ───────────────────────────────────────────────
 function renderStor(){
   const tb=document.getElementById('st-tb');tb.innerHTML='';
-  if(DATA.carichi.length===0){tb.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-icon">🗂</div>Nessun carico registrato</div></td></tr>';return;}
-  [...DATA.carichi].sort((a,b)=>(b.data+b.ora).localeCompare(a.data+a.ora)).forEach(c=>{
+  const carichi=DATA.carichi||[];
+  if(carichi.length===0){tb.innerHTML='<tr><td colspan="10"><div class="empty"><div class="empty-icon">🗂</div>Nessun carico registrato</div></td></tr>';return;}
+  [...carichi].sort((a,b)=>(b.data+b.ora).localeCompare(a.data+a.ora)).forEach(c=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td class="mono">#${c.num_scarico}</td><td class="mono" style="font-size:11px">${c.data} ${c.ora}</td><td style="font-size:11px;color:var(--muted)">${c.das||'—'}</td><td class="mono" style="font-size:11px">+${c.c1.litri_caricati} lt</td><td class="mono" style="font-size:11px">+${c.c2.litri_caricati} lt</td><td class="mono" style="font-size:11px">+${c.c3.litri_caricati} lt</td><td style="font-size:11px;color:var(--muted)">${c.autista||'—'}</td><td><button class="btn bg bsm" onclick="generaRptById(${c.id})">📄</button></td>`;
+    tr.innerHTML=`<td class="mono">#${c.num_scarico}</td><td class="mono" style="font-size:11px">${c.data} ${c.ora}</td><td style="font-size:11px;color:var(--muted)">${c.das||'—'}</td><td class="mono" style="font-size:11px;color:var(--verde)">${c.das_benzina?c.das_benzina.toLocaleString('it-IT')+' lt':'—'}</td><td class="mono" style="font-size:11px;color:var(--diesel)">${c.das_gasolio?c.das_gasolio.toLocaleString('it-IT')+' lt':'—'}</td><td class="mono" style="font-size:11px">+${c.c1.litri_caricati} lt</td><td class="mono" style="font-size:11px">+${c.c2.litri_caricati} lt</td><td class="mono" style="font-size:11px">+${c.c3.litri_caricati} lt</td><td style="font-size:11px;color:var(--muted)">${c.autista||'—'}</td><td><button class="btn bg bsm" onclick="generaRptById(${c.id})">📄</button></td>`;
     tb.appendChild(tr);
   });
 }
 
-// ─── CALCOLATORE ──────────────────────────────────────────
-function calcConv(){
+// ── CALCOLATORE ───────────────────────────────────────────
+window.calcConv=function(){
   const ci=parseInt(document.getElementById('calc-c').value),cm=parseFloat(document.getElementById('calc-cm').value),r=document.getElementById('calc-r');
   if(isNaN(cm)||cm<=0){r.textContent='— litri';return;}
   const lt=cmL(ci,cm);r.textContent=lt!==null?lt.toLocaleString('it-IT')+' litri':'Fuori range';
-}
+};
 
-// ─── REPORT ───────────────────────────────────────────────
+// ── REPORT ────────────────────────────────────────────────
 let rptTxt='';
 function buildRpt(c){
   const L=(lb,v)=>('  '+lb).padEnd(38,'.')+' '+v;
@@ -723,15 +759,24 @@ function buildRpt(c){
   const fC=(lb,cx)=>{
     const ls=['  '+lb.toUpperCase(),'  '+S2];
     if(cx.cm_pre!==null)ls.push(L('Prima del carico',(cx.cm_pre||'—')+' cm = '+(cx.litri_pre||'—').toLocaleString('it-IT')+' litri'));
-    ls.push(L('Litri caricati (DAS)','+'+cx.litri_caricati.toLocaleString('it-IT')+' litri'));
+    ls.push(L('Litri caricati','+'+cx.litri_caricati.toLocaleString('it-IT')+' litri'));
     if(cx.cm_post!==null)ls.push(L('Dopo il carico',(cx.cm_post||'—')+' cm = '+(cx.litri_post||'—').toLocaleString('it-IT')+' litri'));
     return ls.join('\n');
   };
+  const gasSum=(c.c1.litri_caricati||0)+(c.c3.litri_caricati||0);
+  const diffB=c.das_benzina?c.das_benzina-(c.c2.litri_caricati||0):null;
+  const diffG=c.das_gasolio?c.das_gasolio-gasSum:null;
   return[S,'  REPORT CARICO CARBURANTI','  ALA CARBURANTI S.R.L. – VIA XXV APRILE 19 – CASTELFIDARDO',S,'',
     L('Numero Scarico','#'+c.num_scarico),L('Numero DAS',c.das||'—'),L('Data / Ora',c.data+' ore '+c.ora),
     L('Fornitore',c.fornitore||'—'),L('Trasportatore',c.trasportatore||'—'),L('Autista',c.autista||'—'),L('Targa',c.targa||'—'),
     c.note?L('Note',c.note):'','',
-    S,'  CONTATORI POMPE AL MOMENTO DEL CARICO',S2,
+    S,'  QUANTITÀ DAS',S2,
+    L('Benzina (DAS)',(c.das_benzina||0).toLocaleString('it-IT')+' lt'),
+    L('Gasolio (DAS)',(c.das_gasolio||0).toLocaleString('it-IT')+' lt'),
+    L('Gasolio C1+C3 caricati',gasSum.toLocaleString('it-IT')+' lt'),
+    diffB!==null?L('Discrepanza Benzina',(diffB===0?'✓ OK':'⚠ '+diffB.toLocaleString('it-IT')+' lt')):'',
+    diffG!==null?L('Discrepanza Gasolio',(diffG===0?'✓ OK':'⚠ '+diffG.toLocaleString('it-IT')+' lt')):'',
+    '','',S,'  CONTATORI POMPE AL MOMENTO DEL CARICO',S2,
     L('Pompa 1 (Verde)',(c.contatori.p1||'—').toLocaleString('it-IT')),
     L('Pompa 2 (Verde)',(c.contatori.p2||'—').toLocaleString('it-IT')),
     L('Pompa 3 (Gasolio)',(c.contatori.p3||'—').toLocaleString('it-IT')),
@@ -743,28 +788,30 @@ function buildRpt(c){
     S,'  Report generato: '+new Date().toLocaleString('it-IT'),S
   ].filter(l=>l!==undefined).join('\n');
 }
-function generaRpt(c){rptTxt=buildRpt(c);document.getElementById('rpt-num').textContent=c.num_scarico;document.getElementById('rpt-body').textContent=rptTxt;document.getElementById('mo-rpt').classList.add('open');}
-function generaRptById(id){const c=DATA.carichi.find(x=>x.id===id);if(c)generaRpt(c);}
-function rptUltimo(){if(DATA.carichi.length===0){showToast('Nessun carico salvato');return;}generaRpt(DATA.carichi[DATA.carichi.length-1]);}
-function copyRpt(){navigator.clipboard.writeText(rptTxt).then(()=>showToast('Copiato ✓'));}
-function dlRpt(){const b=new Blob([rptTxt],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='scarico_'+document.getElementById('rpt-num').textContent+'_'+new Date().toISOString().slice(0,10)+'.txt';a.click();}
 
-// ─── IMPOSTAZIONI ─────────────────────────────────────────
-async function salvaSoglia(){
+function generaRpt(c){rptTxt=buildRpt(c);document.getElementById('rpt-num').textContent=c.num_scarico;document.getElementById('rpt-body').textContent=rptTxt;document.getElementById('mo-rpt').classList.add('open');}
+window.generaRptById=function(id){const c=(DATA.carichi||[]).find(x=>x.id===id);if(c)generaRpt(c);};
+window.rptUltimo=function(){const carichi=DATA.carichi||[];if(carichi.length===0){showToast('Nessun carico salvato');return;}generaRpt(carichi[carichi.length-1]);};
+window.copyRpt=function(){navigator.clipboard.writeText(rptTxt).then(()=>showToast('Copiato ✓'));};
+window.dlRpt=function(){const b=new Blob([rptTxt],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='scarico_'+document.getElementById('rpt-num').textContent+'_'+new Date().toISOString().slice(0,10)+'.txt';a.click();};
+
+// ── IMPOSTAZIONI ──────────────────────────────────────────
+window.salvaSoglia=async function(){
   const v=parseInt(document.getElementById('s-inp').value);
   if(isNaN(v)||v<0){showToast('Valore non valido');return;}
-  DATA.soglia=v;await saveDrive();showToast('Soglia aggiornata: '+v.toLocaleString('it-IT')+' lt ✓');
-}
-function exportJSON(){
+  DATA.soglia=v;await save();showToast('Soglia aggiornata ✓');
+};
+window.exportJSON=function(){
   const b=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);
   a.download='distributore_backup_'+new Date().toISOString().slice(0,10)+'.json';a.click();
   showToast('Backup esportato ✓');
-}
+};
 
-// ─── UTILS ────────────────────────────────────────────────
-function closeM(id){document.getElementById(id).classList.remove('open');}
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},2500);}
+// ── UTILS ─────────────────────────────────────────────────
+window.closeM=function(id){document.getElementById(id).classList.remove('open');};
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>{t.style.display='none';},3000);}
+window.showToast=showToast;
 document.querySelectorAll('.mo').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
 
 if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/distributore/sw.js').catch(()=>{});});}
@@ -773,6 +820,5 @@ const _n=new Date();
 document.getElementById('ctd').value=_n.toISOString().slice(0,10);
 document.getElementById('cto').value=_n.toTimeString().slice(0,5);
 </script>
-<script src="https://accounts.google.com/gsi/client" onload="onGoogleLoad()" async defer></script>
 </body>
 </html>
